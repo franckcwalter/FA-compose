@@ -18,8 +18,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.devid_academy.tutocomposeoct23.network.ArticleDto
+import com.devid_academy.tutocomposeoct23.ui.crea.CreaContent
+import com.devid_academy.tutocomposeoct23.ui.main.MainContent
 import com.devid_academy.tutocomposeoct23.ui.theme.TutoComposeOct23Theme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +36,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
 
-
+                    CreaContent(){_,_,_,_-> }
 
                 }
             }
