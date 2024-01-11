@@ -1,5 +1,6 @@
 package com.devid_academy.tutocomposeoct23.ui.login
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.devid_academy.tutocomposeoct23.Screen
 import com.devid_academy.tutocomposeoct23.ui.splash.SplashContent
 import com.devid_academy.tutocomposeoct23.ui.splash.SplashViewModel
 import com.devid_academy.tutocomposeoct23.ui.theme.TutoComposeOct23Theme
@@ -31,14 +33,19 @@ fun LoginScreen(
     navController: NavController,
     viewModel : LoginViewModel
 ){
-    // LoginContent()
+    LoginContent(
+        onLogInButtonClicked =  { login, password ->
+            viewModel.logInUser(login, password)},
+        onRegisterButtonClicked = { viewModel.navToRegister() }
+    )
 
     LaunchedEffect(true){
         viewModel.navSharedFlow.collect{
             navController.navigate(it){
-                /*popUpTo(){
-                    inclusive = false
-                } */
+                if (it == Screen.Main.route)
+                    popUpTo(Screen.Login.route){
+                        inclusive = true
+                    }
             }
         }
     }
@@ -46,12 +53,12 @@ fun LoginScreen(
 
 @Composable
 fun LoginContent(
-    onButtonClicked : (String, String) -> Unit
+    onLogInButtonClicked : (String, String) -> Unit,
+    onRegisterButtonClicked : () -> Unit
 ){
 
     var login by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
 
     Box(modifier = Modifier.fillMaxSize()){
 
@@ -81,14 +88,15 @@ fun LoginContent(
             Column(horizontalAlignment = Alignment.CenterHorizontally)
             {
 
-                Button(onClick = { onButtonClicked.invoke(login, password) })
+                Button(onClick = { onLogInButtonClicked.invoke(login, password) })
                 {
                     Text("Se connecter")
                 }
 
                 Spacer(Modifier.height(24.dp))
 
-                Text(text = "Pas de compte ? Inscrivez-vous !")
+                Text(text = "Pas de compte ? Inscrivez-vous !",
+                    modifier = Modifier.clickable { onRegisterButtonClicked.invoke() })
             }
         }
     }
@@ -100,6 +108,6 @@ fun LoginContent(
 @Composable
 fun LoginPreview() {
     TutoComposeOct23Theme {
-        LoginContent(){_,_-> }
+       // LoginContent(){_,_-> }
     }
 }

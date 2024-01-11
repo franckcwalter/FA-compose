@@ -40,15 +40,13 @@ fun EditScreen(
     navController: NavController,
     viewModel : EditViewModel
 ){
-   //  EditContent()
+    EditContent{title, description, imageUrl, selectedCategory ->
+        viewModel.createArticle(title, description, imageUrl, selectedCategory)
+    }
 
     LaunchedEffect(true){
         viewModel.navSharedFlow.collect{
-            navController.navigate(it){
-                /*popUpTo(){
-                    inclusive = false
-                } */
-            }
+            navController.popBackStack()
         }
     }
 
@@ -59,7 +57,6 @@ fun EditContent(
     onButtonClicked : (String, String, String, Int) -> Unit
 )
 {
-
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var imageUrl by remember { mutableStateOf("") }

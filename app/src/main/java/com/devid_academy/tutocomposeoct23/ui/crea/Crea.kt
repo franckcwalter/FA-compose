@@ -46,15 +46,13 @@ fun CreaScreen(
     navController: NavController,
     viewModel : CreaViewModel
 ){
-   //  CreaContent()
+    CreaContent{ title, description, imageUrl, selectedCategory ->
+        viewModel.editArticle(title, description, imageUrl, selectedCategory)
+    }
 
     LaunchedEffect(true){
         viewModel.navSharedFlow.collect{
-            navController.navigate(it){
-                /*popUpTo(){
-                    inclusive = false
-                } */
-            }
+            navController.popBackStack()
         }
     }
 }

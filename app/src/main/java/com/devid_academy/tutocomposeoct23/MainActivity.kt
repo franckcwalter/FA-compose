@@ -36,23 +36,10 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
 
-                    CreaContent(){_,_,_,_-> }
+                    AppNavigation()
 
                 }
             }
         }
-    }
-}
-
-
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TutoComposeOct23Theme {
-
-
     }
 }

@@ -27,6 +27,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +47,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.devid_academy.tutocomposeoct23.Category
 import com.devid_academy.tutocomposeoct23.R
+import com.devid_academy.tutocomposeoct23.Screen
 import com.devid_academy.tutocomposeoct23.network.ArticleDto
 import com.devid_academy.tutocomposeoct23.ui.register.RegisterContent
 import com.devid_academy.tutocomposeoct23.ui.theme.TutoComposeOct23Theme
@@ -55,14 +57,20 @@ fun MainScreen(
     navController: NavController,
     viewModel : MainViewModel
 ){
-    // MainContent(){}
+     MainContent(
+         articleList = listOf(ArticleDto(0,"titre","desc","https://www.planeteanimaux.com/wp-content/uploads/2020/09/races-de-petit-chien-blanc.jpg",2,"",1),
+                            ArticleDto(2,"titre","desc","https://www.planeteanimaux.com/wp-content/uploads/2020/09/races-de-petit-chien-blanc.jpg",2,"",1)),
+         onCreaButtonClicked = { viewModel.navToCrea() },
+         onLogoutButtonClicked = { viewModel.logoutUser() }
+     )
 
     LaunchedEffect(true){
         viewModel.navSharedFlow.collect{
             navController.navigate(it){
-                /*popUpTo(){
-                    inclusive = false
-                } */
+                if (it == Screen.Login.route)
+                    popUpTo(Screen.Main.route){
+                        inclusive = true
+                }
             }
         }
     }
@@ -71,7 +79,8 @@ fun MainScreen(
 @Composable
 fun MainContent(
     articleList : List<ArticleDto>,
-    onArticleClicked : (Long) -> Unit)
+    onCreaButtonClicked : () -> Unit,
+    onLogoutButtonClicked : () -> Unit)
 {
 
     val selectedCategory = remember { mutableStateOf(0) }
@@ -87,14 +96,15 @@ fun MainContent(
                 contentDescription = "Bouton Ajouter un article",
                 modifier = Modifier
                     .padding(10.dp)
-                    .clickable { /* TODO : log out and go to login*/ })
+                    .size(32.dp)
+                    .clickable { onCreaButtonClicked.invoke() })
 
-            Icon(imageVector = Icons.Rounded.Favorite,
+            Icon(imageVector = Icons.Rounded.PowerSettingsNew,
                 contentDescription = "Bouton Se déconnecter",
                 modifier = Modifier
                     .padding(10.dp)
-                    .clickable { /* TODO : go to crea*/ })
-
+                    .size(32.dp)
+                    .clickable { onLogoutButtonClicked.invoke() })
         }
 
         LazyColumn(modifier = Modifier.weight(1f))
@@ -102,7 +112,8 @@ fun MainContent(
             items(articleList)
             {article ->
                 ItemArticle(article){clickedArticleId ->
-                    onArticleClicked(clickedArticleId)
+
+                    /* TODO : EXPAND AND SHOW DETAILS */
                 }
             }
         }
@@ -188,7 +199,7 @@ fun ItemArticle(article : ArticleDto, onArticleClicked : (Long) -> Unit)
                     .build(),
                     placeholder = painterResource(R.drawable.feedarticles_logo),
                     contentDescription = "Illustration d'article",
-                    contentScale = ContentScale.Fit,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .padding(horizontal = 10.dp)
                         .size(50.dp)
@@ -206,6 +217,6 @@ fun ItemArticle(article : ArticleDto, onArticleClicked : (Long) -> Unit)
 @Composable
 fun MainPreview() {
     TutoComposeOct23Theme {
-        MainContent(listOf(ArticleDto(0,"titre","desc","https://www.planeteanimaux.com/wp-content/uploads/2020/09/races-de-petit-chien-blanc.jpg",2,"",1))){_->}
+      //   MainContent(listOf(ArticleDto(0,"titre","desc","https://www.planeteanimaux.com/wp-content/uploads/2020/09/races-de-petit-chien-blanc.jpg",2,"",1))){_->}
     }
 }
