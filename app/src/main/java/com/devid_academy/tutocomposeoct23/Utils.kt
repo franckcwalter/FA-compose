@@ -1,12 +1,18 @@
 package com.devid_academy.tutocomposeoct23
 
+import android.content.Context
 import android.content.SharedPreferences
+import android.widget.Toast
 
 object Category {
     val SPORT = 1
     val MANGA = 2
     val DIVERS = 3
 }
+
+/*TODO : changer pour Int */
+fun Context.toast(userMessage : String) =
+    Toast.makeText(this, userMessage, Toast.LENGTH_LONG).show()
 
 
 class MyPrefs (private val sharedPreferences: SharedPreferences) {
