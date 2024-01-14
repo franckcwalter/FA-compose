@@ -16,9 +16,6 @@ data class ResponseRegisterOrLoginDto(
     val token: String
 )
 
-/** ????  **/
-class GetArticlesDto : ArrayList<ArticleDto>()
-
 data class ArticleDto(
     @Json(name = "id")
     val id: Long,

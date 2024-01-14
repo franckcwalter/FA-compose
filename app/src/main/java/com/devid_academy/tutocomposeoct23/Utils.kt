@@ -3,6 +3,9 @@ package com.devid_academy.tutocomposeoct23
 import android.content.Context
 import android.content.SharedPreferences
 import android.widget.Toast
+import com.devid_academy.tutocomposeoct23.network.ApiInterface
+import retrofit2.HttpException
+import retrofit2.Response
 
 object Category {
     val SPORT = 1
@@ -10,7 +13,7 @@ object Category {
     val DIVERS = 3
 }
 
-/*TODO : changer pour Int */
+//*TODO : changer pour Int */
 fun Context.toast(userMessage : String) =
     Toast.makeText(this, userMessage, Toast.LENGTH_LONG).show()
 
@@ -28,4 +31,10 @@ class MyPrefs (private val sharedPreferences: SharedPreferences) {
         set(value) = sharedPreferences.edit().putString(TOKEN, value).apply()
         get() = sharedPreferences.getString(TOKEN, null)
 
+}
+
+sealed class NetworkResult<out T : Any> {
+    data class Success<out T : Any>(val httpCode: Int, val responseBodyData: T) : NetworkResult<T>()
+    data class Error(val errorCode: Int, val errorMessage: String?) : NetworkResult<Nothing>()
+    data class Exception(val e: Throwable) : NetworkResult<Nothing>()
 }

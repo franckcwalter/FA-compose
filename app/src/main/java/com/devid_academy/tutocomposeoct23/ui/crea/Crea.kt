@@ -37,6 +37,7 @@ import coil.request.ImageRequest
 import com.devid_academy.tutocomposeoct23.Category
 import com.devid_academy.tutocomposeoct23.R
 import com.devid_academy.tutocomposeoct23.network.ArticleDto
+import com.devid_academy.tutocomposeoct23.toast
 import com.devid_academy.tutocomposeoct23.ui.main.MainContent
 import com.devid_academy.tutocomposeoct23.ui.theme.TutoComposeOct23Theme
 
@@ -53,6 +54,13 @@ fun CreaScreen(
     LaunchedEffect(true){
         viewModel.navSharedFlow.collect{
             navController.popBackStack()
+        }
+    }
+
+    val context = LocalContext.current
+    LaunchedEffect(true){
+        viewModel.userMessageSharedFlow.collect{
+            context.toast(it)
         }
     }
 }

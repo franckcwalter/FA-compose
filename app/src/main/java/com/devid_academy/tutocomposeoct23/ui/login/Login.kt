@@ -1,5 +1,6 @@
 package com.devid_academy.tutocomposeoct23.ui.login
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,10 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.devid_academy.tutocomposeoct23.Screen
+import com.devid_academy.tutocomposeoct23.toast
 import com.devid_academy.tutocomposeoct23.ui.splash.SplashContent
 import com.devid_academy.tutocomposeoct23.ui.splash.SplashViewModel
 import com.devid_academy.tutocomposeoct23.ui.theme.TutoComposeOct23Theme
@@ -42,13 +45,22 @@ fun LoginScreen(
     LaunchedEffect(true){
         viewModel.navSharedFlow.collect{
             navController.navigate(it){
-                if (it == Screen.Main.route)
+                if (it == Screen.Main.route){
                     popUpTo(Screen.Login.route){
                         inclusive = true
                     }
+                }
             }
         }
     }
+
+    val context = LocalContext.current
+    LaunchedEffect(true){
+        viewModel.userMessageSharedFlow.collect{
+            context.toast(it)
+        }
+    }
+
 }
 
 @Composable

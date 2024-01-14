@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,6 +17,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,15 +35,24 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.devid_academy.tutocomposeoct23.Category
 import com.devid_academy.tutocomposeoct23.R
+import com.devid_academy.tutocomposeoct23.network.ArticleDto
+import com.devid_academy.tutocomposeoct23.toast
 import com.devid_academy.tutocomposeoct23.ui.theme.TutoComposeOct23Theme
 
 @Composable
 fun EditScreen(
     navController: NavController,
-    viewModel : EditViewModel
+    viewModel : EditViewModel,
+    articleId : Long
 ){
-    EditContent{title, description, imageUrl, selectedCategory ->
-        viewModel.createArticle(title, description, imageUrl, selectedCategory)
+
+    val articleToEdit by viewModel.articleToEditStateFlow.collectAsState()
+
+    viewModel.fetchArticle(articleId)
+
+
+    EditContent(articleToEdit){ title, description, imageUrl, selectedCategory ->
+        viewModel.updateArticle(articleId, title, description, imageUrl, selectedCategory)
     }
 
     LaunchedEffect(true){
@@ -50,10 +61,19 @@ fun EditScreen(
         }
     }
 
+    val context = LocalContext.current
+    LaunchedEffect(true){
+        viewModel.userMessageSharedFlow.collect{
+            context.toast(it)
+        }
+    }
 }
+
+
 
 @Composable
 fun EditContent(
+    articleToEdit : ArticleDto,
     onButtonClicked : (String, String, String, Int) -> Unit
 )
 {
@@ -62,6 +82,21 @@ fun EditContent(
     var imageUrl by remember { mutableStateOf("") }
 
     val selectedCategory = remember { mutableStateOf(Category.DIVERS) }
+
+
+    LaunchedEffect(articleToEdit) {
+
+        title = articleToEdit.titre
+        description = articleToEdit.descriptif
+        imageUrl = articleToEdit.urlImage
+
+        when(articleToEdit.categorie){
+            Category.SPORT -> selectedCategory.value = Category.SPORT
+            Category.MANGA -> selectedCategory.value = Category.MANGA
+            Category.DIVERS -> selectedCategory.value = Category.DIVERS
+        }
+    }
+
 
     Column(
         Modifier.fillMaxSize(),
@@ -174,7 +209,7 @@ fun EditContent(
 @Composable
 fun EditPreview() {
     TutoComposeOct23Theme {
-        EditContent(){_,_,_,_-> }
+        EditContent(ArticleDto(0, "TITRE", "DESK","",0,"",0)){_,_,_,_-> }
     }
 }
 

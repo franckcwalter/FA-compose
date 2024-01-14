@@ -2,6 +2,7 @@ package com.devid_academy.tutocomposeoct23.ui.main
 
 import android.widget.ImageButton
 import android.widget.RadioGroup
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,6 +31,8 @@ import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -49,38 +52,60 @@ import com.devid_academy.tutocomposeoct23.Category
 import com.devid_academy.tutocomposeoct23.R
 import com.devid_academy.tutocomposeoct23.Screen
 import com.devid_academy.tutocomposeoct23.network.ArticleDto
+import com.devid_academy.tutocomposeoct23.toast
 import com.devid_academy.tutocomposeoct23.ui.register.RegisterContent
 import com.devid_academy.tutocomposeoct23.ui.theme.TutoComposeOct23Theme
 
 @Composable
 fun MainScreen(
     navController: NavController,
-    viewModel : MainViewModel
-){
-     MainContent(
-         articleList = listOf(ArticleDto(0,"titre","desc","https://www.planeteanimaux.com/wp-content/uploads/2020/09/races-de-petit-chien-blanc.jpg",2,"",1),
-                            ArticleDto(2,"titre","desc","https://www.planeteanimaux.com/wp-content/uploads/2020/09/races-de-petit-chien-blanc.jpg",2,"",1)),
-         onCreaButtonClicked = { viewModel.navToCrea() },
-         onLogoutButtonClicked = { viewModel.logoutUser() }
-     )
+    viewModel : MainViewModel)
+{
 
-    LaunchedEffect(true){
+    val articleList by viewModel.articleList.collectAsState()
+
+    LaunchedEffect(Unit){
         viewModel.navSharedFlow.collect{
             navController.navigate(it){
                 if (it == Screen.Login.route)
                     popUpTo(Screen.Main.route){
                         inclusive = true
-                }
+                    }
             }
         }
     }
+
+    val context = LocalContext.current
+    LaunchedEffect(true){
+        viewModel.userMessageSharedFlow.collect{
+            context.toast(it)
+        }
+    }
+
+
+    MainContent(
+         articleList = articleList,
+
+         /*listOf(ArticleDto(0,"titre","desc","https://www.planeteanimaux.com/wp-content/uploads/2020/09/races-de-petit-chien-blanc.jpg",2,"",1),
+                            ArticleDto(2,"titre","desc","https://www.planeteanimaux.com/wp-content/uploads/2020/09/races-de-petit-chien-blanc.jpg",2,"",1)) */
+
+        onCreaButtonClicked = { viewModel.navToCrea() },
+        onLogoutButtonClicked = { viewModel.logoutUser()},
+        onArticleClicked = {clickedArticleId, clickedArticleUserId ->
+            viewModel.expandArticleOrGoToEdit(clickedArticleId, clickedArticleUserId) }
+     )
+
+
+    viewModel.fetchArticles()
+
 }
 
 @Composable
 fun MainContent(
     articleList : List<ArticleDto>,
     onCreaButtonClicked : () -> Unit,
-    onLogoutButtonClicked : () -> Unit)
+    onLogoutButtonClicked : () -> Unit,
+    onArticleClicked: (Long, Long) -> Unit)
 {
 
     val selectedCategory = remember { mutableStateOf(0) }
@@ -111,9 +136,12 @@ fun MainContent(
         {
             items(articleList)
             {article ->
-                ItemArticle(article){clickedArticleId ->
 
-                    /* TODO : EXPAND AND SHOW DETAILS */
+                ItemArticle(article){clickedArticleId, clickedArticleUserId ->
+
+                    onArticleClicked(clickedArticleId,clickedArticleUserId)
+
+                    /* TODO : EXPAND AND SHOW DETAILS or GO TO EDIT */
                 }
             }
         }
@@ -163,19 +191,17 @@ fun MainContent(
             }
         }
     }
+
+
 }
 
 @Composable
-fun ItemArticle(article : ArticleDto, onArticleClicked : (Long) -> Unit)
+fun ItemArticle(article : ArticleDto, onArticleClicked : (Long, Long) -> Unit)
 {
     Card(modifier = Modifier
         .padding(10.dp)
         .fillMaxWidth()
-        .clickable {
-
-            onArticleClicked.invoke(article.id)
-
-        })
+        .clickable { onArticleClicked.invoke(article.id, article.idU) })
     {
         Row(verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,

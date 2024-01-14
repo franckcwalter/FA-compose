@@ -2,8 +2,9 @@ package com.devid_academy.tutocomposeoct23.ui.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.devid_academy.tutocomposeoct23.network.ApiInterface
-import com.devid_academy.tutocomposeoct23.network.RegisterDto
+import com.devid_academy.tutocomposeoct23.MyPrefs
+import com.devid_academy.tutocomposeoct23.NetworkResult
+import com.devid_academy.tutocomposeoct23.network.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterViewModel
 @Inject constructor(
-    private val apiInterface : ApiInterface
+    private val repository: Repository,
+    private val myPrefs: MyPrefs
 ) : ViewModel()
 {
 
@@ -36,21 +38,40 @@ class RegisterViewModel
             else {
 
                 withContext(Dispatchers.IO){
-                    apiInterface.register(RegisterDto(login,password))
+
+                    repository.register(login, password)
+
                 }.let {
 
-                    _userMessageSharedFlow.emit(it!!.body()!!.token)
+                    when (it) {
+                        is NetworkResult.Success -> {
 
+                            with(myPrefs){
+                                user_id = it.responseBodyData.id
+                                token = it.responseBodyData.token
+                            }
 
+                            _navSharedFlow.emit(true)
+                            _userMessageSharedFlow.emit("Bonjour $login, votre compte a bien été créé.")
 
+                        }
+                        is NetworkResult.Error -> {
 
-                    /* TODO : SI LE USER EST BIEN ENREGISTRÉ */
-                    /* TODO : ajouter les infos dans my prefs*/
+                            when(it.errorCode){
+                                303 -> "Le nom d'tilisateur est déjà utilisé. (Erreur 303)"
+                                304 -> "Le compte n'a pas pu être créé. Veuillez réessayer plus tard. (Erreur 304)"
+                                400 -> "Le compte n'a pas pu être créé. Problème de paramètres. Veuillez contacter l'administrateur. (Erreur 400)"
+                                503 -> "Le compte n'a pas pu être créé. Erreur de requête mysql. Veuillez contacter l'administrateur.(Erreur 503)"
+                                else -> "Erreur. Le compte n'a pas pu être créé. Veuillez réessayer plus tard. "
+                            }.let {errorMessage ->
+                                _userMessageSharedFlow.emit(errorMessage)
+                            }
 
-                    _navSharedFlow.emit(true)
-
-
-
+                        }
+                        is NetworkResult.Exception -> {
+                            _userMessageSharedFlow.emit("Erreur réseau. Veuillez vérifier votre connexion Internet et réessayer.")
+                        }
+                    }
                 }
             }
         }

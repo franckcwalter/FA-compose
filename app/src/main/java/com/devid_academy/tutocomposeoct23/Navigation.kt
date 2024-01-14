@@ -65,7 +65,8 @@ fun AppNavigation(){
             )
         }
 
-        composable(Screen.Main.route){
+        composable(route = Screen.Main.route)
+        {
             val mainViewModel : MainViewModel = hiltViewModel()
             MainScreen(
                 navController = navController,
@@ -79,11 +80,15 @@ fun AppNavigation(){
                 viewModel = creaViewModel)
         }
 
-        composable(Screen.Edit.route){
-            val userViewModel : EditViewModel = hiltViewModel()
+        composable(route = Screen.Edit.route + "/{idArticle}",
+                arguments = listOf(navArgument("idArticle") { type = NavType.LongType })
+        ){
+            val editViewModel : EditViewModel = hiltViewModel()
+            val idArticle = it.arguments?.getLong("idArticle") ?: 0
             EditScreen(
                 navController = navController,
-                viewModel = userViewModel)
+                viewModel = editViewModel,
+                articleId = idArticle)
         }
 
     }
