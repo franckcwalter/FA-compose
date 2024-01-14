@@ -31,6 +31,9 @@ class MainViewModel
     private val _selectedCategoryStateFlow = MutableStateFlow(0)
     val selectedCategoryStateFlow = _selectedCategoryStateFlow.asStateFlow()
 
+    private val _expandedArticleIdStateFlow = MutableStateFlow(0L)
+    val expandedArticleIdStateFlow = _expandedArticleIdStateFlow.asStateFlow()
+
 
     private val _navSharedFlow = MutableSharedFlow<String>()
     val navSharedFlow = _navSharedFlow.asSharedFlow()
@@ -154,7 +157,13 @@ class MainViewModel
 
         }else{
 
-            /*TODO : expand to show details */
+            if(expandedArticleIdStateFlow.value == clickedArticleId){
+                _expandedArticleIdStateFlow.value = 0
+            } else {
+                _expandedArticleIdStateFlow.value = clickedArticleId
+
+            }
+
 
         }
     }

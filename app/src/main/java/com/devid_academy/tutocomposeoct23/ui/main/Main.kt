@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +28,8 @@ import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.runtime.Composable
@@ -43,6 +46,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -64,6 +68,9 @@ fun MainScreen(
 
     val articleList by viewModel.articleList.collectAsState()
     val selectedCategory by viewModel.selectedCategoryStateFlow.collectAsState()
+
+    val expandedArticleId by viewModel.expandedArticleIdStateFlow.collectAsState()
+
 
     LaunchedEffect(Unit){
         viewModel.navSharedFlow.collect{
@@ -87,16 +94,17 @@ fun MainScreen(
     MainContent(
         articleList = articleList,
         selectedCategory = selectedCategory,
+        expandedArticleId = expandedArticleId,
         onCreaButtonClicked = { viewModel.navToCrea() },
         onLogoutButtonClicked = { viewModel.logoutUser()},
         onArticleClicked = {clickedArticleId, clickedArticleUserId ->
             viewModel.expandArticleOrGoToEdit(clickedArticleId, clickedArticleUserId) },
-        onCategoryChanged = { selectedCategory ->
-            viewModel.changeSelectedCategoryAndFetchArticles(selectedCategory)
-        }
+        onCategoryChanged = { viewModel.changeSelectedCategoryAndFetchArticles(it) }
      )
 
-    viewModel.fetchArticles()
+    LaunchedEffect(Unit){
+        viewModel.fetchArticles()
+    }
 
 }
 
@@ -105,6 +113,7 @@ fun MainScreen(
 fun MainContent(
     articleList : List<ArticleDto>,
     selectedCategory : Int,
+    expandedArticleId : Long,
     onCreaButtonClicked : () -> Unit,
     onLogoutButtonClicked : () -> Unit,
     onArticleClicked: (Long, Long) -> Unit,
@@ -138,7 +147,10 @@ fun MainContent(
             items(articleList)
             {article ->
 
-                ItemArticle(article){clickedArticleId, clickedArticleUserId ->
+                ItemArticle(
+                    article = article,
+                    expanded = expandedArticleId == article.id
+                ){clickedArticleId, clickedArticleUserId ->
 
                     onArticleClicked(clickedArticleId,clickedArticleUserId)
 
@@ -153,9 +165,11 @@ fun MainContent(
             Row(horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier
                         .weight(.25f)
-                        .selectable(selected = selectedCategory == 0,
-                                    onClick = { onCategoryChanged(0) },
-                                    role = Role.RadioButton))
+                        .selectable(
+                            selected = selectedCategory == 0,
+                            onClick = { onCategoryChanged(0) },
+                            role = Role.RadioButton
+                        ))
             {
                 RadioButton(selected = selectedCategory == 0, onClick = null)
                 Text("Tout")
@@ -164,9 +178,11 @@ fun MainContent(
             Row(horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
                     .weight(.25f)
-                    .selectable(selected = selectedCategory == Category.SPORT,
-                                onClick = { onCategoryChanged(Category.SPORT) },
-                                role = Role.RadioButton))
+                    .selectable(
+                        selected = selectedCategory == Category.SPORT,
+                        onClick = { onCategoryChanged(Category.SPORT) },
+                        role = Role.RadioButton
+                    ))
             {
                 RadioButton(selected = selectedCategory == Category.SPORT, onClick = null)
                 Text("Sport")
@@ -175,9 +191,11 @@ fun MainContent(
             Row(horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
                     .weight(.25f)
-                    .selectable(selected = selectedCategory == Category.MANGA,
-                                onClick = { onCategoryChanged(Category.MANGA) },
-                                role = Role.RadioButton))
+                    .selectable(
+                        selected = selectedCategory == Category.MANGA,
+                        onClick = { onCategoryChanged(Category.MANGA) },
+                        role = Role.RadioButton
+                    ))
             {
                 RadioButton(selected = selectedCategory == Category.MANGA, onClick = null)
                 Text("Manga")
@@ -186,9 +204,11 @@ fun MainContent(
             Row(horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
                     .weight(.25f)
-                    .selectable(selected = selectedCategory == Category.DIVERS,
-                                onClick = { onCategoryChanged(Category.DIVERS) },
-                                role = Role.RadioButton))
+                    .selectable(
+                        selected = selectedCategory == Category.DIVERS,
+                        onClick = { onCategoryChanged(Category.DIVERS) },
+                        role = Role.RadioButton
+                    ))
             {
                 RadioButton(selected = selectedCategory == Category.DIVERS, onClick = null)
                 Text("Divers")
@@ -198,44 +218,82 @@ fun MainContent(
 }
 
 @Composable
-fun ItemArticle(article : ArticleDto, onArticleClicked : (Long, Long) -> Unit)
+fun ItemArticle(
+    article : ArticleDto,
+    expanded : Boolean,
+    onArticleClicked : (Long, Long) -> Unit)
 {
     Card(modifier = Modifier
         .padding(10.dp)
         .fillMaxWidth()
         .clickable { onArticleClicked.invoke(article.id, article.idU) })
     {
-        Row(verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .background(
-                    when (article.categorie) {
-                        1 -> Color.Magenta
-                        2 -> Color.Red
-                        3 -> Color.Yellow
-                        else -> Color.Black
-                    }
-                )
-                .border(BorderStroke(2.dp, Color.Black))
-                .padding(vertical = 10.dp))
+        Column(modifier = Modifier
+            .background(
+                when (article.categorie) {
+                    1 -> Color.Magenta
+                    2 -> Color.Red
+                    3 -> Color.Yellow
+                    else -> Color.Black
+                }
+            )
+            .border(BorderStroke(2.dp, Color.Black))
+            .padding(vertical = 10.dp))
+        {
 
+            Row(verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween)
             {
-
-            AsyncImage(model = ImageRequest.Builder(LocalContext.current)
+                AsyncImage(model = ImageRequest.Builder(LocalContext.current)
                     .data(article.urlImage)
-                 // .crossfade(true)
+                    // .crossfade(true)
                     .build(),
                     placeholder = painterResource(R.drawable.feedarticles_logo),
+                    error = painterResource(R.drawable.feedarticles_logo),
                     contentDescription = "Illustration d'article",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .padding(horizontal = 10.dp)
-                        .size(50.dp)
+                        .size(if (expanded) 96.dp else 48.dp)
                         .clip(CircleShape)
-            )
-            Text(text = article.titre,
-                modifier = Modifier.weight(1f))
+                )
+                Text(text = article.titre,
+                    fontWeight = if (expanded) FontWeight.Bold else FontWeight.Normal,
+                    modifier = Modifier.weight(1f))
+
+                if (expanded)
+                    Icon(imageVector = Icons.Rounded.ExpandLess,
+                        contentDescription = "Réduire la taille de la carte",
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .size(24.dp))
+
+            }
+
+            if(expanded){
+
+                Row(horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    .fillMaxWidth())
+                {
+                    Text(text = "Du " + article.createdAt)
+
+                    Text(text = "Cat." + when (article.categorie){
+                        Category.SPORT -> "Sport"
+                        Category.MANGA -> "Manga"
+                        Category.DIVERS -> "Divers"
+                        else -> {}
+                    })
+                }
+
+                Text(text = article.descriptif,
+                    modifier = Modifier.padding(horizontal = 8.dp))
+
+            }
         }
+
+
+
     }
 }
 
