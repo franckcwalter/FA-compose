@@ -24,15 +24,24 @@ class MainViewModel
     private var repository: Repository
 ) : ViewModel()
 {
-    private val _navSharedFlow = MutableSharedFlow<String>()
-    val navSharedFlow = _navSharedFlow.asSharedFlow()
 
     private val _articleList = MutableStateFlow(emptyList<ArticleDto>())
     val articleList = _articleList.asStateFlow()
 
+    private val _selectedCategoryRemStateFlow = MutableStateFlow(0)
+    val selectedCategoryRemStateFlow = _selectedCategoryRemStateFlow.asStateFlow()
+
+
+    private val _navSharedFlow = MutableSharedFlow<String>()
+    val navSharedFlow = _navSharedFlow.asSharedFlow()
+
     private val _userMessageSharedFlow = MutableSharedFlow<String>()
     val userMessageSharedFlow = _userMessageSharedFlow.asSharedFlow()
 
+
+    fun changeSelectedCategory(selectedCategory: Int) {
+        _selectedCategoryRemStateFlow.value = selectedCategory
+    }
 
     fun fetchArticles(){
 
@@ -48,10 +57,13 @@ class MainViewModel
                     when (it) {
                         is NetworkResult.Success -> {
 
-                            /** MAP LIST IF FILTER IS ON **/
-
                             _articleList.value = it.responseBodyData
 
+                            if (_selectedCategoryRemStateFlow.value > 0){
+                                _articleList.value = it.responseBodyData.filter{ article ->
+                                    article.categorie == _selectedCategoryRemStateFlow.value
+                                }
+                            }
                         }
 
                         is NetworkResult.Error -> {
@@ -96,6 +108,8 @@ class MainViewModel
         }
     }
 
+
+
     fun deleteArticle(idArticle : Long, token : String){
 
         viewModelScope.launch {
@@ -139,8 +153,10 @@ class MainViewModel
 
         }else{
 
+            /*TODO : expand to show details */
 
         }
     }
+
 
 }

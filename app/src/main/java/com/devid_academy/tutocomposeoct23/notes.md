@@ -17,11 +17,11 @@ ASPECT GRAPHIQUE :
 animations
 Gestion des transitions entre screens : Si vous souhaitez ajouter des transitions entre les écrans, vous pouvez explorer les différentes options fournies par Jetpack Compose, telles que enterTransition et exitTransition dans le NavHost. Cela peut ajouter une expérience utilisateur plus fluide.
 
+faire les radiobutton de manière dynamique ? -> factorisey 
 
 
 
 SI T'AS LE TEMPS :  
-faire les radiobutton de manière dynamique ?
 
 
 
