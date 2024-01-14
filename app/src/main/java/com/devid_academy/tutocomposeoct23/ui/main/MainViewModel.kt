@@ -28,8 +28,8 @@ class MainViewModel
     private val _articleList = MutableStateFlow(emptyList<ArticleDto>())
     val articleList = _articleList.asStateFlow()
 
-    private val _selectedCategoryRemStateFlow = MutableStateFlow(0)
-    val selectedCategoryRemStateFlow = _selectedCategoryRemStateFlow.asStateFlow()
+    private val _selectedCategoryStateFlow = MutableStateFlow(0)
+    val selectedCategoryStateFlow = _selectedCategoryStateFlow.asStateFlow()
 
 
     private val _navSharedFlow = MutableSharedFlow<String>()
@@ -39,8 +39,9 @@ class MainViewModel
     val userMessageSharedFlow = _userMessageSharedFlow.asSharedFlow()
 
 
-    fun changeSelectedCategory(selectedCategory: Int) {
-        _selectedCategoryRemStateFlow.value = selectedCategory
+    fun changeSelectedCategoryAndFetchArticles(selectedCategory: Int) {
+        _selectedCategoryStateFlow.value = selectedCategory
+        fetchArticles()
     }
 
     fun fetchArticles(){
@@ -59,9 +60,9 @@ class MainViewModel
 
                             _articleList.value = it.responseBodyData
 
-                            if (_selectedCategoryRemStateFlow.value > 0){
+                            if (_selectedCategoryStateFlow.value > 0){
                                 _articleList.value = it.responseBodyData.filter{ article ->
-                                    article.categorie == _selectedCategoryRemStateFlow.value
+                                    article.categorie == _selectedCategoryStateFlow.value
                                 }
                             }
                         }

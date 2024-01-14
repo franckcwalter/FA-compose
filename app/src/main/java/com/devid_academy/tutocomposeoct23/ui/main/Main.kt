@@ -63,7 +63,7 @@ fun MainScreen(
 {
 
     val articleList by viewModel.articleList.collectAsState()
-    val selectedCategoryRem by viewModel.selectedCategoryRemStateFlow.collectAsState()
+    val selectedCategory by viewModel.selectedCategoryStateFlow.collectAsState()
 
     LaunchedEffect(Unit){
         viewModel.navSharedFlow.collect{
@@ -86,14 +86,13 @@ fun MainScreen(
 
     MainContent(
         articleList = articleList,
-        selectedCategoryRem = selectedCategoryRem,
+        selectedCategory = selectedCategory,
         onCreaButtonClicked = { viewModel.navToCrea() },
         onLogoutButtonClicked = { viewModel.logoutUser()},
         onArticleClicked = {clickedArticleId, clickedArticleUserId ->
             viewModel.expandArticleOrGoToEdit(clickedArticleId, clickedArticleUserId) },
         onCategoryChanged = { selectedCategory ->
-            viewModel.changeSelectedCategory(selectedCategory)
-            viewModel.fetchArticles()
+            viewModel.changeSelectedCategoryAndFetchArticles(selectedCategory)
         }
      )
 
@@ -105,14 +104,12 @@ fun MainScreen(
 @Composable
 fun MainContent(
     articleList : List<ArticleDto>,
-    selectedCategoryRem : Int,
+    selectedCategory : Int,
     onCreaButtonClicked : () -> Unit,
     onLogoutButtonClicked : () -> Unit,
     onArticleClicked: (Long, Long) -> Unit,
     onCategoryChanged : (Int) -> Unit)
 {
-
-    val selectedCategory = remember { mutableStateOf(selectedCategoryRem) }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize())
@@ -153,74 +150,51 @@ fun MainContent(
         Row(modifier = Modifier.padding(vertical = 12.dp))
         {
 
-
-
             Row(horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier
                         .weight(.25f)
-                        .selectable(
-                            selected = selectedCategory.value == 0,
-                            onClick = { selectedCategory.value = 0
-                                onCategoryChanged(selectedCategory.value) },
-                            role = Role.RadioButton
-                        ))
+                        .selectable(selected = selectedCategory == 0,
+                                    onClick = { onCategoryChanged(0) },
+                                    role = Role.RadioButton))
             {
-                RadioButton(selected = selectedCategory.value == 0, onClick = null)
+                RadioButton(selected = selectedCategory == 0, onClick = null)
                 Text("Tout")
             }
 
             Row(horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
                     .weight(.25f)
-                    .selectable(
-                        selected = selectedCategory.value == Category.SPORT,
-                        onClick = {
-                            selectedCategory.value = Category.SPORT
-                            onCategoryChanged(selectedCategory.value)
-                        },
-                        role = Role.RadioButton
-                    ))
+                    .selectable(selected = selectedCategory == Category.SPORT,
+                                onClick = { onCategoryChanged(Category.SPORT) },
+                                role = Role.RadioButton))
             {
-                RadioButton(selected = selectedCategory.value == Category.SPORT, onClick = null)
+                RadioButton(selected = selectedCategory == Category.SPORT, onClick = null)
                 Text("Sport")
             }
 
             Row(horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
                     .weight(.25f)
-                    .selectable(
-                        selected = selectedCategory.value == Category.MANGA,
-                        onClick = {
-                            selectedCategory.value = Category.MANGA
-                            onCategoryChanged(selectedCategory.value)
-                        },
-                        role = Role.RadioButton
-                    ))
+                    .selectable(selected = selectedCategory == Category.MANGA,
+                                onClick = { onCategoryChanged(Category.MANGA) },
+                                role = Role.RadioButton))
             {
-                RadioButton(selected = selectedCategory.value == Category.MANGA, onClick = null)
+                RadioButton(selected = selectedCategory == Category.MANGA, onClick = null)
                 Text("Manga")
             }
 
             Row(horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
                     .weight(.25f)
-                    .selectable(
-                        selected = selectedCategory.value == Category.DIVERS,
-                        onClick = {
-                            selectedCategory.value = Category.DIVERS
-                            onCategoryChanged(selectedCategory.value)
-                        },
-                        role = Role.RadioButton
-                    ))
-
+                    .selectable(selected = selectedCategory == Category.DIVERS,
+                                onClick = { onCategoryChanged(Category.DIVERS) },
+                                role = Role.RadioButton))
             {
-                RadioButton(selected = selectedCategory.value == Category.DIVERS, onClick = null)
+                RadioButton(selected = selectedCategory == Category.DIVERS, onClick = null)
                 Text("Divers")
             }
         }
     }
-
-
 }
 
 @Composable
