@@ -1,4 +1,4 @@
-package com.devid_academy.tutocomposeoct23.app
+package com.devid_academy.tutocomposeoct23
 
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel

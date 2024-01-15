@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import com.devid_academy.tutocomposeoct23.app.AppNavigation
+import com.devid_academy.tutocomposeoct23.AppNavigation
 import com.devid_academy.tutocomposeoct23.ui.theme.FeedArticlesComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 

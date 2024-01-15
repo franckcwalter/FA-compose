@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.devid_academy.tutocomposeoct23.R
-import com.devid_academy.tutocomposeoct23.app.Screen
+import com.devid_academy.tutocomposeoct23.Screen
 import com.devid_academy.tutocomposeoct23.ui.theme.FeedArticlesComposeTheme
 
 

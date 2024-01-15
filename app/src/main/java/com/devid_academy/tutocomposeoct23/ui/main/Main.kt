@@ -50,7 +50,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.devid_academy.tutocomposeoct23.Category
 import com.devid_academy.tutocomposeoct23.R
-import com.devid_academy.tutocomposeoct23.app.Screen
+import com.devid_academy.tutocomposeoct23.Screen
 import com.devid_academy.tutocomposeoct23.formatDate
 import com.devid_academy.tutocomposeoct23.network.ArticleDto
 import com.devid_academy.tutocomposeoct23.toast

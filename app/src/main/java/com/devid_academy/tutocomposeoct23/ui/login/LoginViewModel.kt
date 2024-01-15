@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.devid_academy.tutocomposeoct23.MyPrefs
 import com.devid_academy.tutocomposeoct23.NetworkResult
 import com.devid_academy.tutocomposeoct23.R
-import com.devid_academy.tutocomposeoct23.app.Screen
+import com.devid_academy.tutocomposeoct23.Screen
 import com.devid_academy.tutocomposeoct23.network.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
