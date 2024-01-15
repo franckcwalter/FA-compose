@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devid_academy.tutocomposeoct23.MyPrefs
 import com.devid_academy.tutocomposeoct23.NetworkResult
+import com.devid_academy.tutocomposeoct23.R
 import com.devid_academy.tutocomposeoct23.network.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -24,17 +25,22 @@ class RegisterViewModel
     private val _navSharedFlow = MutableSharedFlow<Boolean>()
     val navSharedFlow = _navSharedFlow.asSharedFlow()
 
-    private val _userMessageSharedFlow = MutableSharedFlow<String>()
+    private val _userMessageSharedFlow = MutableSharedFlow<Int>()
     val userMessageSharedFlow = _userMessageSharedFlow.asSharedFlow()
 
-    fun registerUser(login: String, password: String, passwordConfirm: String) {
+    fun registerUser(
+        login: String,
+        password: String,
+        passwordConfirm: String
+    )
+    {
 
         viewModelScope.launch {
 
             if(login.isBlank() || password.isBlank() || passwordConfirm.isBlank())
-                _userMessageSharedFlow.emit("Veuillez remplir tous les champs.")
+                _userMessageSharedFlow.emit(R.string.message_fill_out_all_fields)
             else if (password != passwordConfirm)
-                _userMessageSharedFlow.emit("Les mots de passe ne correspondent pas.")
+                _userMessageSharedFlow.emit(R.string.message_passwords_do_not_match)
             else {
 
                 withContext(Dispatchers.IO){
@@ -52,24 +58,23 @@ class RegisterViewModel
                             }
 
                             _navSharedFlow.emit(true)
-                            _userMessageSharedFlow.emit("Bonjour $login, votre compte a bien été créé.")
+                            _userMessageSharedFlow.emit(R.string.message_account_created)
 
                         }
                         is NetworkResult.Error -> {
 
                             when(it.errorCode){
-                                303 -> "Le nom d'tilisateur est déjà utilisé. (Erreur 303)"
-                                304 -> "Le compte n'a pas pu être créé. Veuillez réessayer plus tard. (Erreur 304)"
-                                400 -> "Le compte n'a pas pu être créé. Problème de paramètres. Veuillez contacter l'administrateur. (Erreur 400)"
-                                503 -> "Le compte n'a pas pu être créé. Erreur de requête mysql. Veuillez contacter l'administrateur.(Erreur 503)"
-                                else -> "Erreur. Le compte n'a pas pu être créé. Veuillez réessayer plus tard. "
+                                303 -> R.string.message_account_not_created_login_already_in_use
+                                304 -> R.string.message_account_not_created
+                                400 -> R.string.message_account_not_created_parameter_problem
+                                503 -> R.string.message_account_not_created_myssql_error
+                                else -> R.string.message_account_not_created
                             }.let {errorMessage ->
                                 _userMessageSharedFlow.emit(errorMessage)
                             }
-
                         }
                         is NetworkResult.Exception -> {
-                            _userMessageSharedFlow.emit("Erreur réseau. Veuillez vérifier votre connexion Internet et réessayer.")
+                            _userMessageSharedFlow.emit(R.string.message_account_not_created)
                         }
                     }
                 }

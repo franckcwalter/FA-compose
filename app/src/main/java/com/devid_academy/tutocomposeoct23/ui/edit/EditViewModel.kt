@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devid_academy.tutocomposeoct23.MyPrefs
 import com.devid_academy.tutocomposeoct23.NetworkResult
+import com.devid_academy.tutocomposeoct23.R
 import com.devid_academy.tutocomposeoct23.network.ArticleDto
 import com.devid_academy.tutocomposeoct23.network.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,17 +25,16 @@ class EditViewModel
 ) : ViewModel(){
 
 
+    private val _articleToEditStateFlow =
+        MutableStateFlow(ArticleDto(0, "", "","",0,"",0))
+    val articleToEditStateFlow = _articleToEditStateFlow.asStateFlow()
+
 
     private val _navSharedFlow = MutableSharedFlow<Boolean>()
     val navSharedFlow = _navSharedFlow.asSharedFlow()
 
-    private val _userMessageSharedFlow = MutableSharedFlow<String>()
+    private val _userMessageSharedFlow = MutableSharedFlow<Int>()
     val userMessageSharedFlow = _userMessageSharedFlow.asSharedFlow()
-
-
-    private val _articleToEditStateFlow =  MutableStateFlow(ArticleDto(0, "", "","",0,"",0))
-    val articleToEditStateFlow = _articleToEditStateFlow.asStateFlow()
-
 
 
     fun fetchArticle(articleId: Long){
@@ -58,18 +58,18 @@ class EditViewModel
                         is NetworkResult.Error -> {
 
                             when (it.errorCode) {
-                                303 -> "L'article demandé n'existe pas. (Erreur 303)"
-                                400 -> "L'article n'a pas pu être récupéré. Problème de paramètres. Veuillez contacter l'administrateur. (Erreur 400)"
-                                401 -> "Accès non autorisé. Veuillez vous déconnecter puis vous reconnecter. (Erreur 401)"
-                                503 -> "L'article n'a pas pu être récupéré. Erreur de requête mysql. Veuillez contacter l'administrateur.(Erreur 503)"
-                                else -> "Erreur. article n'a pas pu être récupéré. Veuillez réessayer plus tard. "
+                                303 -> R.string.message_getarticle_article_not_found
+                                400 -> R.string.message_getarticle_parameter_problem
+                                401 -> R.string.message_getarticle_auth_problem
+                                503 -> R.string.message_getarticle_mysql_problem
+                                else -> R.string.message_getarticle_article_could_not_be_fetched
                             }.let { errorMessage ->
                                 _userMessageSharedFlow.emit(errorMessage)
                             }
                         }
 
                         is NetworkResult.Exception -> {
-                            _userMessageSharedFlow.emit("Erreur. article n'a pas pu être récupéré. Veuillez réessayer plus tard.")
+                            _userMessageSharedFlow.emit(R.string.message_getarticle_article_could_not_be_fetched)
                         }
                     }
                 }
@@ -77,48 +77,50 @@ class EditViewModel
         }
     }
 
-
-
-    fun updateArticle(idArticle : Long, title: String, description: String, imageUrl: String, selectedCategory: Int) {
-
+    fun updateArticle(
+        idArticle : Long,
+        title: String,
+        description: String,
+        imageUrl : String,
+        selectedCategory: Int
+    )
+    {
         viewModelScope.launch {
 
             if(title.isBlank() || description.isBlank() || imageUrl.isBlank())
-                _userMessageSharedFlow.emit("Veuillez remplir tous les champs.")
+                _userMessageSharedFlow.emit(R.string.message_fill_out_all_fields)
             else {
                 withContext(Dispatchers.IO){
-                    repository.updateArticle(idArticle, myPrefs.token!!, title, description, imageUrl, selectedCategory)
+                    repository.updateArticle(idArticle, myPrefs.token!!,
+                                            title, description, imageUrl, selectedCategory)
                 }.let {
 
                     when (it) {
                         is NetworkResult.Success -> {
 
                             _navSharedFlow.emit(true)
-                            _userMessageSharedFlow.emit("Votre article a bien été mis à jour.")
+                            _userMessageSharedFlow.emit(R.string.message_article_updated)
 
                         }
                         is NetworkResult.Error -> {
 
                             when(it.errorCode){
-                                303 -> "L'article n'a pas pu être mis à jour. Problème de paramètres. Veuillez contacter l'administrateur. (Erreur 303)"
-                                304 -> "L'article n'a pas pu être mis à jour. Veuillez réessayer plus tard. (Erreur 304)"
-                                400 -> "L'article n'a pas pu être mis à jour. Problème de paramètres. Veuillez contacter l'administrateur. (Erreur 400)"
-                                401 -> "L'article n'a pas pu être mis à jour. Problème d'autorisation. Veuillez vous reconnecter. (Erreur 401)"
-                                503 -> "Le compte n'a pas pu être créé. Erreur de requête mysql. Veuillez contacter l'administrateur.(Erreur 503)"
-                                else -> "Erreur. L'article n'a pas pu être mis à jour. Veuillez réessayer plus tard. "
+                                303 -> R.string.message_article_not_updated_parameter_problem
+                                304 -> R.string.message_article_not_updated
+                                400 -> R.string.message_article_not_updated_parameter_problem
+                                401 -> R.string.message_article_not_updated_auth_problem
+                                503 -> R.string.message_article_not_updated_mysql_problem
+                                else -> R.string.message_article_not_updated
                             }.let {errorMessage ->
                                 _userMessageSharedFlow.emit(errorMessage)
                             }
-
                         }
                         is NetworkResult.Exception -> {
-                            _userMessageSharedFlow.emit("Erreur. L'article n'a pas pu être mis à jour. Veuillez réessayer plus tard.")
+                            _userMessageSharedFlow.emit(R.string.message_article_not_updated)
                         }
                     }
                 }
             }
         }
-
     }
-
 }

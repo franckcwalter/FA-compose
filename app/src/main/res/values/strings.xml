@@ -1,37 +1,91 @@
 <resources>
     <string name="app_name">Feed Articles</string>
+
     <string name="desc_logo">Feed articles logo</string>
+    <string name="desc_buttonlabel_maintocrea">Bouton Ajouter un article</string>
+    <string name="desc_buttonlabel_logOut">Bouton Se déconnecter</string>
+    <string name="desc_buttonlabel_deleteArticle">Bouton Supprimer l\'article</string>
+    <string name="desc_buttonlabel_reducearticlesize">Bouton Réduire la taille de l\'article</string>
+
+
     <string name="login_maintitle">Connectez-vous</string>
     <string name="login_et_login">Login</string>
     <string name="login_et_password">Mot de passe</string>
     <string name="login_button_linktoregister">Pas de compte ? Inscrivez-vous !</string>
     <string name="login_button_login">Se connecter</string>
+
     <string name="register_et_password">Mot de passe</string>
     <string name="register_et_password_confirm">Confirmation Mot de passe</string>
     <string name="register_et_login">Login</string>
     <string name="register_button_register">S\'inscrire</string>
     <string name="register_maintitle">S\'inscrire</string>
+
+    <string name="crea_pagetitle">Nouvel Article</string>
     <string name="crea_et_title">Titre</string>
     <string name="crea_et_content">Contenu</string>
     <string name="crea_et_urlImage">Image URL</string>
     <string name="crea_desc_articleillustration">Illustration d\'article</string>
     <string name="crea_button_create">Enregistrer</string>
+
+    <string name="edit_pagetitle">Edition Article</string>
     <string name="edit_et_title">Titre</string>
     <string name="edit_et_desc">Contenu</string>
     <string name="edit_et_imageurl">Image URL</string>
     <string name="edit_desc_articleillustration">Illustration article</string>
     <string name="edit_button_create">Mettre à jour</string>
+
+    <string name="articledetail_date">Du %1\$s</string>
+    <string name="articledetail_cat">Cat. %1\$s</string>
+    <string name="detail_articleillustration">Illustration d\'article</string>
+
     <string name="rblabel_misc">Divers</string>
     <string name="rblabel_manga">Manga</string>
     <string name="rblabel_sport">Sport</string>
     <string name="rblabel_all">Tout</string>
-    <string name="desc_buttonlabel_maintocrea">Bouton Ajouter un article</string>
-    <string name="desc_buttonlabel_logOut">Bouton Se déconnecter</string>
-    <string name="desc_buttonlabel_deleteArticle">Bouton Supprimer l\'article</string>
-    <string name="articledetail_date">Du %1\$s</string>
-    <string name="articledetail_cat">Cat. %1\$s</string>
-    <string name="desc_buttonlabel_reducearticlesize">Bouton Réduire la taille de l\'article</string>
-    <string name="detail_articleillustration">Illustration d\'article</string>
-    <string name="crea_pagetitle">Nouvel Article</string>
-    <string name="edit_pagetitle">Edition Article</string>
+
+
+
+    <string name="message_fill_out_all_fields">Veuillez remplir tous les champs.</string>
+
+    <string name="message_article_created">Votre article a bien été créé.</string>
+    <string name="message_error_article_not_created_parameter_problem">L\'article n\'a pas pu être créé. Problème de paramètres. Veuillez contacter l\'administrateur.</string>
+    <string name="message_error_article_not_created">L\'article n\'a pas pu être créé. Veuillez réessayer plus tard.</string>
+    <string name="message_error_article_not_created_auth_problem">L\'article n\'a pas pu être créé. Problème d\'autorisation. Veuillez vous reconnecter.</string>
+    <string name="message_error_article_not_created_mysql_problem">L\'article n\'a pas pu être créé. Erreur de requête base de données. Veuillez contacter l\'administrateur.</string>
+
+    <string name="message_getarticle_article_not_found">L\'article demandé n\'existe pas.</string>
+    <string name="message_getarticle_parameter_problem">L\'article n\'a pas pu être récupéré. Problème de paramètres. Veuillez contacter l\'administrateur.</string>
+    <string name="message_getarticle_auth_problem">Accès non autorisé. Veuillez vous déconnecter puis vous reconnecter.</string>
+    <string name="message_getarticle_mysql_problem">L\'article n\'a pas pu être récupéré. Erreur de requête mysql. Veuillez contacter l\'administrateur.</string>
+    <string name="message_getarticle_article_could_not_be_fetched">Erreur. article n\'a pas pu être récupéré. Veuillez réessayer plus tard.</string>
+
+    <string name="message_article_updated">Votre article a bien été mis à jour.</string>
+    <string name="message_article_not_updated_parameter_problem">L\'article n\'a pas pu être mis à jour. Problème de paramètres. Veuillez contacter l\'administrateur.</string>
+    <string name="message_article_not_updated">L\'article n\'a pas pu être mis à jour. Veuillez réessayer plus tard.</string>
+    <string name="message_article_not_updated_auth_problem">L\'article n\'a pas pu être mis à jour. Problème d\'autorisation. Veuillez vous reconnecter.</string>
+    <string name="message_article_not_updated_mysql_problem">L\'article n\'a pas pu être mis à jour. Erreur de requête mysql. Veuillez contacter l\'administrateur.</string>
+
+    <string name="welcome_message">Ravi de vous revoir!</string>
+    <string name="message_security_problem">Problème de sécurité. Veuillez vous déconnecter et vous reconnecter.</string>
+    <string name="message_login_failed_parameter_problem">Vous n\'avez pas pu être connecté. Problème de paramètres. Veuillez contacter l\'administrateur.</string>
+    <string name="message_login_failed_login_or_password_incorrect">Le nom d\'utilisateur ou le mot de passe est incorrect. Veuillez réessayer.</string>
+    <string name="message_login_failed_mysql_problem">Vous n\'avez pas pu être connecté. Erreur de requête mysql. Veuillez contacter l\'administrateur.</string>
+    <string name="message_login_failed">Erreur. Vous n\'avez pas pu être connecté. Veuillez réessayer plus tard.</string>
+
+    <string name="message_fetch_articles_failed_auth_problem">Accès non autorisé. Veuillez vous déconnecter puis vous reconnecter.</string>
+    <string name="message_fetch_articles_failed_mysql_error">Les articles n\'ont pas pu être récupérés. Erreur de requête mysql. Veuillez contacter l\'administrateur.</string>
+    <string name="message_fetch_articles_failed">Erreur. Les articles n\'ont pas pu être récupérés. Veuillez réessayer plus tard.</string>
+
+    <string name="message_article_deleted">Votre article a bien été supprimé.</string>
+    <string name="message_article_not_deleted">L\'article n\'a pas pu être supprimé. Veuillez réessayer plus tard.</string>
+    <string name="message_article_not_deleted_parameter_problem">L\'article n\'a pas pu être supprimé. Problème de paramètres. Veuillez contacter l\'administrateur.</string>
+    <string name="message_article_not_deleted_auth_problem">L\'article n\'a pas pu être supprimé. Problème d\'autorisation. Veuillez vous reconnecter.</string>
+    <string name="message_article_not_deleted_mysql_problem">L\'article n\'a pas pu être supprimé. Erreur de requête mysql. Veuillez contacter l\'administrateur.</string>
+
+    <string name="message_passwords_do_not_match">Les mots de passe ne correspondent pas.</string>
+    <string name="message_account_created">Votre compte a bien été créé !</string>
+    <string name="message_account_not_created_login_already_in_use">Le nom d\'tilisateur est déjà utilisé.</string>
+    <string name="message_account_not_created">Le compte n\'a pas pu être créé. Veuillez réessayer plus tard.</string>
+    <string name="message_account_not_created_parameter_problem">Le compte n\'a pas pu être créé. Problème de paramètres. Veuillez contacter l\'administrateur.</string>
+    <string name="message_account_not_created_myssql_error">Le compte n\'a pas pu être créé. Erreur de requête mysql. Veuillez contacter l\'administrateur.</string>
 </resources>

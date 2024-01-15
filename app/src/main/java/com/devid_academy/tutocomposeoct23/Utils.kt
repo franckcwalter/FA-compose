@@ -16,7 +16,7 @@ object Category {
 }
 
 //*TODO : changer pour Int */
-fun Context.toast(userMessage : String) =
+fun Context.toast(userMessage : Int) =
     Toast.makeText(this, userMessage, Toast.LENGTH_LONG).show()
 
 
@@ -47,6 +47,6 @@ fun formatDate(creationDate : String) : String? {
     return SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(creationDate)?.let {
                 SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                     .format(it)
-    }
+                }
 }
 

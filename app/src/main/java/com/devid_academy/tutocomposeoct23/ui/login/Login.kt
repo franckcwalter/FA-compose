@@ -1,23 +1,15 @@
 package com.devid_academy.tutocomposeoct23.ui.login
 
-import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,12 +25,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.devid_academy.tutocomposeoct23.R
-import com.devid_academy.tutocomposeoct23.Screen
+import com.devid_academy.tutocomposeoct23.app.Screen
 import com.devid_academy.tutocomposeoct23.toast
 import com.devid_academy.tutocomposeoct23.ui.CustomButton
 import com.devid_academy.tutocomposeoct23.ui.CustomTextField
-import com.devid_academy.tutocomposeoct23.ui.splash.SplashContent
-import com.devid_academy.tutocomposeoct23.ui.splash.SplashViewModel
 import com.devid_academy.tutocomposeoct23.ui.theme.FeedArticlesComposeTheme
 
 

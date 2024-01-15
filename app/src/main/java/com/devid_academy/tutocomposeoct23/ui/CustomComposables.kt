@@ -61,7 +61,8 @@ fun CustomButton(
 {
     Button(
         onClick = { onClick.invoke()  },
-        modifier = if(largeButton) Modifier.fillMaxWidth().padding(horizontal = 24.dp) else Modifier.requiredWidth(200.dp)
+        modifier = if(largeButton) Modifier.fillMaxWidth().padding(horizontal = 24.dp)
+                    else Modifier.requiredWidth(200.dp)
     )
     { Text(text = stringResource(labelRes),
         modifier = Modifier.padding(vertical = 4.dp)) }

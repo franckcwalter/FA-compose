@@ -3,7 +3,7 @@ package com.devid_academy.tutocomposeoct23.ui.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devid_academy.tutocomposeoct23.MyPrefs
-import com.devid_academy.tutocomposeoct23.Screen
+import com.devid_academy.tutocomposeoct23.app.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow

@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,11 +23,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.devid_academy.tutocomposeoct23.R
-import com.devid_academy.tutocomposeoct23.Screen
+import com.devid_academy.tutocomposeoct23.app.Screen
 import com.devid_academy.tutocomposeoct23.toast
 import com.devid_academy.tutocomposeoct23.ui.CustomButton
 import com.devid_academy.tutocomposeoct23.ui.CustomTextField
-import com.devid_academy.tutocomposeoct23.ui.login.LoginContent
 import com.devid_academy.tutocomposeoct23.ui.theme.FeedArticlesComposeTheme
 
 @Composable

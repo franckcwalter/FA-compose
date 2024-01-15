@@ -1,12 +1,11 @@
 package com.devid_academy.tutocomposeoct23.ui.main
 
-import androidx.compose.material.DismissState
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devid_academy.tutocomposeoct23.MyPrefs
 import com.devid_academy.tutocomposeoct23.NetworkResult
-import com.devid_academy.tutocomposeoct23.Screen
+import com.devid_academy.tutocomposeoct23.R
+import com.devid_academy.tutocomposeoct23.app.Screen
 import com.devid_academy.tutocomposeoct23.network.ArticleDto
 import com.devid_academy.tutocomposeoct23.network.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,7 +42,7 @@ class MainViewModel
     private val _navSharedFlow = MutableSharedFlow<String>()
     val navSharedFlow = _navSharedFlow.asSharedFlow()
 
-    private val _userMessageSharedFlow = MutableSharedFlow<String>()
+    private val _userMessageSharedFlow = MutableSharedFlow<Int>()
     val userMessageSharedFlow = _userMessageSharedFlow.asSharedFlow()
 
 
@@ -52,7 +51,7 @@ class MainViewModel
         fetchArticles()
     }
 
-    fun fetchArticles(){
+    fun fetchArticles() {
 
         viewModelScope.launch {
 
@@ -64,12 +63,13 @@ class MainViewModel
 
                 }.let {
                     when (it) {
+
                         is NetworkResult.Success -> {
 
                             _articleList.value = it.responseBodyData
 
-                            if (_selectedCategoryStateFlow.value > 0){
-                                _articleList.value = it.responseBodyData.filter{ article ->
+                            if (_selectedCategoryStateFlow.value > 0) {
+                                _articleList.value = it.responseBodyData.filter { article ->
                                     article.categorie == _selectedCategoryStateFlow.value
                                 }
                             }
@@ -78,102 +78,106 @@ class MainViewModel
                         is NetworkResult.Error -> {
 
                             when (it.errorCode) {
-                                400 -> "Les articles n'ont pas pu être récupérés. Problème de paramètres. Veuillez contacter l'administrateur. (Erreur 400)"
-                                401 -> "Accès non autorisé. Veuillez vous déconnecter puis vous reconnecter. (Erreur 401)"
-                                503 -> "Les articles n'ont pas pu être récupérés. Erreur de requête mysql. Veuillez contacter l'administrateur.(Erreur 503)"
-                                else -> "Erreur. Les articles n'ont pas pu être récupérés. Veuillez réessayer plus tard. "
+                                401 -> R.string.message_fetch_articles_failed_auth_problem
+                                503 -> R.string.message_fetch_articles_failed_mysql_error
+                                else -> R.string.message_fetch_articles_failed
                             }.let { errorMessage ->
                                 _userMessageSharedFlow.emit(errorMessage)
                             }
-
                         }
 
                         is NetworkResult.Exception -> {
-                            _userMessageSharedFlow.emit("Erreur. Les articles n'ont pas pu être récupérés. Veuillez réessayer plus tard.")
+                            _userMessageSharedFlow.emit(R.string.message_fetch_articles_failed)
                         }
-
                     }
                 }
             }
         }
     }
 
+    fun deleteArticle(
+        articleId: Long,
+        articleUserId: Long
+    ) {
+        if (myPrefs.user_id == articleUserId) {
+
+            viewModelScope.launch {
+
+                withContext(Dispatchers.IO) {
+
+                    repository.deleteArticle(articleId, myPrefs.token!!)
+
+                }.let {
+
+                    when (it) {
+
+                        is NetworkResult.Success -> {
+
+                            _userMessageSharedFlow.emit(R.string.message_article_deleted)
+                            _articleWasDeletedStateFlow.emit(true)
+                            fetchArticles()
+
+                        }
+
+                        is NetworkResult.Error -> {
+
+                            when (it.errorCode) {
+                                304 -> R.string.message_article_not_deleted
+                                400 -> R.string.message_article_not_deleted_parameter_problem
+                                401 -> R.string.message_article_not_deleted_auth_problem
+                                503 -> R.string.message_article_not_deleted_mysql_problem
+                                else -> R.string.message_article_not_deleted
+                            }.let { errorMessage ->
+                                _userMessageSharedFlow.emit(errorMessage)
+                            }
+                        }
+
+                        is NetworkResult.Exception -> {
+                            _userMessageSharedFlow.emit(R.string.message_article_not_deleted)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun expandArticleOrGoToEdit(clickedArticleId: Long, clickedArticleUserId: Long) {
+
+        if (clickedArticleUserId == myPrefs.user_id) {
+
+            viewModelScope.launch {
+                _navSharedFlow.emit(Screen.Edit.route + "/$clickedArticleId")
+            }
+
+        } else {
+
+            if (expandedArticleIdStateFlow.value == clickedArticleId) {
+                _expandedArticleIdStateFlow.value = 0
+            } else {
+                _expandedArticleIdStateFlow.value = clickedArticleId
+            }
+        }
+
+    }
+
     fun navToCrea() {
-        viewModelScope.launch{
+
+        viewModelScope.launch {
             _navSharedFlow.emit(Screen.Crea.route)
         }
     }
 
+
     fun logoutUser() {
 
-        viewModelScope.launch{
+        viewModelScope.launch {
 
             _navSharedFlow.emit(Screen.Login.route)
 
-            with(myPrefs){
+            with(myPrefs) {
                 user_id = 0
                 token = null
             }
         }
     }
-
-
-
-    fun deleteArticle(articleId : Long, articleUserId : Long){
-
-        if(myPrefs.user_id == articleUserId){
-            viewModelScope.launch {
-                withContext(Dispatchers.IO){
-                    repository.deleteArticle(articleId, myPrefs.token!!)
-                }.let {
-
-                    when (it) {
-                        is NetworkResult.Success -> {
-
-                            _userMessageSharedFlow.emit("Votre article a bien été supprimé.")
-                            _articleWasDeletedStateFlow.emit(true)
-                            fetchArticles()
-
-                        }
-                        is NetworkResult.Error -> {
-
-                            when(it.errorCode){
-                                304 -> "L'article n'a pas pu être supprimé. Veuillez réessayer plus tard."
-                                400 -> "L'article n'a pas pu être supprimé. Problème de paramètres. Veuillez contacter l'administrateur."
-                                401 -> "L'article n'a pas pu être supprimé. Problème d'autorisation. Veuillez vous reconnecter."
-                                503 -> "Le compte n'a pas pu être créé. Erreur de requête mysql. Veuillez contacter l'administrateur.(Erreur 503)"
-                                else -> "Erreur. L'article n'a pas pu être supprimé. Veuillez réessayer plus tard. "
-                            }.let {errorMessage ->
-                                _userMessageSharedFlow.emit(errorMessage)
-                            }
-
-                        }
-                        is NetworkResult.Exception -> {
-                            _userMessageSharedFlow.emit("Erreur. L'article n'a pas pu être supprimé. Veuillez réessayer plus tard.")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    fun expandArticleOrGoToEdit(clickedArticleId : Long, clickedArticleUserId : Long) {
-
-        if(clickedArticleUserId == myPrefs.user_id){
-            viewModelScope.launch{
-                _navSharedFlow.emit(Screen.Edit.route + "/$clickedArticleId" )
-            }
-
-        }else{
-
-            if(expandedArticleIdStateFlow.value == clickedArticleId){
-                _expandedArticleIdStateFlow.value = 0
-            } else {
-                _expandedArticleIdStateFlow.value = clickedArticleId
-
-            }
-        }
-    }
-
-
 }
