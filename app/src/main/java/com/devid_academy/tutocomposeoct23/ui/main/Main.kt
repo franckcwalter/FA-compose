@@ -1,13 +1,17 @@
 package com.devid_academy.tutocomposeoct23.ui.main
 
+import android.graphics.ColorMatrix
 import android.widget.ImageButton
 import android.widget.RadioGroup
 import android.widget.Toast
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,25 +23,44 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.Card
+import androidx.compose.material.DismissDirection
+import androidx.compose.material.DismissState
+import androidx.compose.material.DismissValue
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
+import androidx.compose.material.SwipeToDismiss
+import androidx.compose.material.SwipeableState
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.PowerSettingsNew
+import androidx.compose.material.rememberDismissState
+import androidx.compose.material.rememberSwipeableState
+import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +68,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,10 +79,17 @@ import coil.request.ImageRequest
 import com.devid_academy.tutocomposeoct23.Category
 import com.devid_academy.tutocomposeoct23.R
 import com.devid_academy.tutocomposeoct23.Screen
+import com.devid_academy.tutocomposeoct23.formatDate
 import com.devid_academy.tutocomposeoct23.network.ArticleDto
 import com.devid_academy.tutocomposeoct23.toast
-import com.devid_academy.tutocomposeoct23.ui.register.RegisterContent
-import com.devid_academy.tutocomposeoct23.ui.theme.TutoComposeOct23Theme
+import com.devid_academy.tutocomposeoct23.ui.CustomRadioButtonRow
+import com.devid_academy.tutocomposeoct23.ui.theme.FeedArticlesComposeTheme
+import com.devid_academy.tutocomposeoct23.ui.theme.MainBlack
+import com.devid_academy.tutocomposeoct23.ui.theme.MangaBackground
+import com.devid_academy.tutocomposeoct23.ui.theme.MiscBackground
+import com.devid_academy.tutocomposeoct23.ui.theme.SportBackground
+import kotlin.math.absoluteValue
+
 
 @Composable
 fun MainScreen(
@@ -70,6 +101,8 @@ fun MainScreen(
     val selectedCategory by viewModel.selectedCategoryStateFlow.collectAsState()
 
     val expandedArticleId by viewModel.expandedArticleIdStateFlow.collectAsState()
+
+    val articleWasDeleted by viewModel.articleWasDeletedStateFlow.collectAsState()
 
 
     LaunchedEffect(Unit){
@@ -90,11 +123,13 @@ fun MainScreen(
         }
     }
 
-
     MainContent(
         articleList = articleList,
         selectedCategory = selectedCategory,
         expandedArticleId = expandedArticleId,
+        articleWasDeleted = articleWasDeleted,
+        onItemSwiped = { swipedArticleId, swipedArticleUserId  ->
+            viewModel.deleteArticle(swipedArticleId, swipedArticleUserId)},
         onCreaButtonClicked = { viewModel.navToCrea() },
         onLogoutButtonClicked = { viewModel.logoutUser()},
         onArticleClicked = {clickedArticleId, clickedArticleUserId ->
@@ -105,15 +140,17 @@ fun MainScreen(
     LaunchedEffect(Unit){
         viewModel.fetchArticles()
     }
-
 }
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainContent(
     articleList : List<ArticleDto>,
     selectedCategory : Int,
     expandedArticleId : Long,
+    articleWasDeleted : Boolean,
+    onItemSwiped : (Long, Long) -> Unit,
     onCreaButtonClicked : () -> Unit,
     onLogoutButtonClicked : () -> Unit,
     onArticleClicked: (Long, Long) -> Unit,
@@ -128,91 +165,87 @@ fun MainContent(
             modifier = Modifier.fillMaxWidth())
         {
             Icon(imageVector = Icons.Rounded.Add,
-                contentDescription = "Bouton Ajouter un article",
+                contentDescription = stringResource(R.string.desc_buttonlabel_maintocrea),
                 modifier = Modifier
                     .padding(10.dp)
                     .size(32.dp)
-                    .clickable { onCreaButtonClicked.invoke() })
+                    .clickable { onCreaButtonClicked.invoke() }
+            )
 
             Icon(imageVector = Icons.Rounded.PowerSettingsNew,
-                contentDescription = "Bouton Se déconnecter",
+                contentDescription = stringResource(R.string.desc_buttonlabel_logOut),
                 modifier = Modifier
                     .padding(10.dp)
                     .size(32.dp)
-                    .clickable { onLogoutButtonClicked.invoke() })
+                    .clickable { onLogoutButtonClicked.invoke() }
+            )
         }
 
         LazyColumn(modifier = Modifier.weight(1f))
         {
-            items(articleList)
+            items(items = articleList, key = { it.id })
             {article ->
 
-                ItemArticle(
-                    article = article,
-                    expanded = expandedArticleId == article.id
-                ){clickedArticleId, clickedArticleUserId ->
-
-                    onArticleClicked(clickedArticleId,clickedArticleUserId)
-
-                    /* TODO : EXPAND AND SHOW DETAILS or GO TO EDIT */
+                SwipeToDismiss(state = rememberDismissState  {
+                    if(it == DismissValue.DismissedToStart)
+                        onItemSwiped.invoke(article.id, article.idU)
+                    articleWasDeleted },
+                    directions = setOf(DismissDirection.EndToStart) ,
+                    dismissThresholds = {FractionalThreshold(0.75f)},
+                    background = {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(50.dp, 15.dp, 15.dp, 15.dp)
+                                .background(color = Color.Red))
+                        { Icon(
+                            modifier = Modifier.align(Alignment.CenterEnd),
+                            imageVector = Icons.Rounded.Delete,
+                            contentDescription = stringResource(R.string.desc_buttonlabel_deleteArticle))
+                        }
+                    }
+                )
+                {
+                    ItemArticle(
+                        article = article,
+                        expanded = expandedArticleId == article.id)
+                    {clickedArticleId, clickedArticleUserId ->
+                        onArticleClicked(clickedArticleId,clickedArticleUserId)
+                    }
                 }
             }
         }
 
-        Row(modifier = Modifier.padding(vertical = 12.dp))
+        Row(modifier = Modifier.padding(vertical = 16.dp, horizontal = 12.dp))
         {
 
-            Row(horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier
-                        .weight(.25f)
-                        .selectable(
-                            selected = selectedCategory == 0,
-                            onClick = { onCategoryChanged(0) },
-                            role = Role.RadioButton
-                        ))
-            {
-                RadioButton(selected = selectedCategory == 0, onClick = null)
-                Text("Tout")
-            }
+            CustomRadioButtonRow(
+                category = 0,
+                labelResId = R.string.rblabel_all,
+                selectedCategory = selectedCategory,
+                onClick = { onCategoryChanged(0) }
+            )
 
-            Row(horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
-                    .weight(.25f)
-                    .selectable(
-                        selected = selectedCategory == Category.SPORT,
-                        onClick = { onCategoryChanged(Category.SPORT) },
-                        role = Role.RadioButton
-                    ))
-            {
-                RadioButton(selected = selectedCategory == Category.SPORT, onClick = null)
-                Text("Sport")
-            }
+            CustomRadioButtonRow(
+                category = Category.SPORT,
+                labelResId = R.string.rblabel_sport,
+                selectedCategory = selectedCategory,
+                onClick = { onCategoryChanged(Category.SPORT) }
+            )
 
-            Row(horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
-                    .weight(.25f)
-                    .selectable(
-                        selected = selectedCategory == Category.MANGA,
-                        onClick = { onCategoryChanged(Category.MANGA) },
-                        role = Role.RadioButton
-                    ))
-            {
-                RadioButton(selected = selectedCategory == Category.MANGA, onClick = null)
-                Text("Manga")
-            }
+            CustomRadioButtonRow(
+                category = Category.MANGA,
+                labelResId = R.string.rblabel_manga,
+                selectedCategory = selectedCategory,
+                onClick = { onCategoryChanged(Category.MANGA) }
+            )
 
-            Row(horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
-                    .weight(.25f)
-                    .selectable(
-                        selected = selectedCategory == Category.DIVERS,
-                        onClick = { onCategoryChanged(Category.DIVERS) },
-                        role = Role.RadioButton
-                    ))
-            {
-                RadioButton(selected = selectedCategory == Category.DIVERS, onClick = null)
-                Text("Divers")
-            }
+            CustomRadioButtonRow(
+                category = Category.DIVERS,
+                labelResId = R.string.rblabel_misc,
+                selectedCategory = selectedCategory,
+                onClick = { onCategoryChanged(Category.DIVERS) }
+            )
         }
     }
 }
@@ -226,15 +259,16 @@ fun ItemArticle(
     Card(modifier = Modifier
         .padding(10.dp)
         .fillMaxWidth()
-        .clickable { onArticleClicked.invoke(article.id, article.idU) })
+        .clickable { onArticleClicked.invoke(article.id, article.idU) }
+    )
     {
         Column(modifier = Modifier
             .background(
                 when (article.categorie) {
-                    1 -> Color.Magenta
-                    2 -> Color.Red
-                    3 -> Color.Yellow
-                    else -> Color.Black
+                    1 -> SportBackground
+                    2 -> MangaBackground
+                    3 -> MiscBackground
+                    else -> MaterialTheme.colors.background
                 }
             )
             .border(BorderStroke(2.dp, Color.Black))
@@ -244,65 +278,70 @@ fun ItemArticle(
             Row(verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween)
             {
+
                 AsyncImage(model = ImageRequest.Builder(LocalContext.current)
                     .data(article.urlImage)
-                    // .crossfade(true)
+                    .crossfade(true)
                     .build(),
                     placeholder = painterResource(R.drawable.feedarticles_logo),
                     error = painterResource(R.drawable.feedarticles_logo),
-                    contentDescription = "Illustration d'article",
+                    contentDescription = stringResource(R.string.detail_articleillustration),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .padding(horizontal = 10.dp)
                         .size(if (expanded) 96.dp else 48.dp)
                         .clip(CircleShape)
+
                 )
+
                 Text(text = article.titre,
                     fontWeight = if (expanded) FontWeight.Bold else FontWeight.Normal,
                     modifier = Modifier.weight(1f))
 
                 if (expanded)
                     Icon(imageVector = Icons.Rounded.ExpandLess,
-                        contentDescription = "Réduire la taille de la carte",
+                        contentDescription = stringResource(R.string.desc_buttonlabel_reducearticlesize),
                         modifier = Modifier
                             .padding(4.dp)
-                            .size(24.dp))
+                            .size(24.dp)
+                    )
 
             }
 
             if(expanded){
 
                 Row(horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                    .fillMaxWidth())
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .fillMaxWidth())
                 {
-                    Text(text = "Du " + article.createdAt)
 
-                    Text(text = "Cat." + when (article.categorie){
-                        Category.SPORT -> "Sport"
-                        Category.MANGA -> "Manga"
-                        Category.DIVERS -> "Divers"
-                        else -> {}
-                    })
+                    Text(stringResource(R.string.articledetail_date, formatDate(article.createdAt) ?: ""))
+
+                    Text(stringResource(R.string.articledetail_cat,
+                                            when (article.categorie){
+                                                Category.SPORT -> stringResource(R.string.rblabel_sport)
+                                                Category.MANGA -> stringResource(R.string.rblabel_manga)
+                                                Category.DIVERS -> stringResource(R.string.rblabel_misc)
+                                                else -> {}
+                                            })
+                    )
                 }
 
                 Text(text = article.descriptif,
                     modifier = Modifier.padding(horizontal = 8.dp))
-
             }
         }
-
-
-
     }
 }
-
 
 
 @Preview(showBackground = true)
 @Composable
 fun MainPreview() {
-    TutoComposeOct23Theme {
-      //   MainContent(listOf(ArticleDto(0,"titre","desc","https://www.planeteanimaux.com/wp-content/uploads/2020/09/races-de-petit-chien-blanc.jpg",2,"",1))){_->}
+    FeedArticlesComposeTheme {
+
     }
 }
+
+

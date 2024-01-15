@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.devid_academy.tutocomposeoct23.network.ArticleDto
 import com.devid_academy.tutocomposeoct23.ui.crea.CreaContent
 import com.devid_academy.tutocomposeoct23.ui.main.MainContent
-import com.devid_academy.tutocomposeoct23.ui.theme.TutoComposeOct23Theme
+import com.devid_academy.tutocomposeoct23.ui.theme.FeedArticlesComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -29,16 +29,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TutoComposeOct23Theme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
+            FeedArticlesComposeTheme {
 
-                    AppNavigation()
-
-                }
+                Surface(modifier = Modifier.fillMaxSize(),
+                     color = MaterialTheme.colors.background)
+                { AppNavigation() }
             }
         }
     }

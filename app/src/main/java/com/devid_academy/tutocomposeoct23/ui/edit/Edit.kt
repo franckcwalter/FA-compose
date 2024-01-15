@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -27,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,7 +39,10 @@ import com.devid_academy.tutocomposeoct23.Category
 import com.devid_academy.tutocomposeoct23.R
 import com.devid_academy.tutocomposeoct23.network.ArticleDto
 import com.devid_academy.tutocomposeoct23.toast
-import com.devid_academy.tutocomposeoct23.ui.theme.TutoComposeOct23Theme
+import com.devid_academy.tutocomposeoct23.ui.CustomButton
+import com.devid_academy.tutocomposeoct23.ui.CustomRadioButtonRow
+import com.devid_academy.tutocomposeoct23.ui.CustomTextField
+import com.devid_academy.tutocomposeoct23.ui.theme.FeedArticlesComposeTheme
 
 @Composable
 fun EditScreen(
@@ -47,9 +52,6 @@ fun EditScreen(
 ){
 
     val articleToEdit by viewModel.articleToEditStateFlow.collectAsState()
-
-    viewModel.fetchArticle(articleId)
-
 
     EditContent(articleToEdit){ title, description, imageUrl, selectedCategory ->
         viewModel.updateArticle(articleId, title, description, imageUrl, selectedCategory)
@@ -67,9 +69,10 @@ fun EditScreen(
             context.toast(it)
         }
     }
+
+    viewModel.fetchArticle(articleId)
+
 }
-
-
 
 @Composable
 fun EditContent(
@@ -83,12 +86,11 @@ fun EditContent(
 
     val selectedCategory = remember { mutableStateOf(Category.DIVERS) }
 
-
     LaunchedEffect(articleToEdit) {
 
-        title = articleToEdit.titre
+        title       = articleToEdit.titre
         description = articleToEdit.descriptif
-        imageUrl = articleToEdit.urlImage
+        imageUrl    = articleToEdit.urlImage
 
         when(articleToEdit.categorie){
             Category.SPORT -> selectedCategory.value = Category.SPORT
@@ -97,55 +99,60 @@ fun EditContent(
         }
     }
 
-
     Column(
         Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceAround)
     {
-        Text(text = "Edition Article")
+        Text(text = stringResource(R.string.edit_pagetitle),
+            style = MaterialTheme.typography.h1)
 
         Column(horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly)
         {
-            TextField(value = title,
-                onValueChange = {title = it},
-                label = { Text("Titre") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp))
+
+            CustomTextField(
+                value = title,
+                onValueChange = { title = it },
+                labelRes = R.string.edit_et_title,
+                isPassword = false,
+                largeTexfield = true,
+                tallTextField = false
+            )
 
             Spacer(Modifier.height(12.dp))
 
-            TextField(value = description,
-                onValueChange = {description = it},
-                label = { Text("Contenu") },
-                modifier = Modifier
-                    .height(200.dp)
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp))
+            CustomTextField(
+                value = description,
+                onValueChange = { description = it },
+                labelRes = R.string.edit_et_desc,
+                isPassword = false,
+                largeTexfield = true,
+                tallTextField = true
+            )
 
             Spacer(Modifier.height(12.dp))
 
-            TextField(value = imageUrl,
-                onValueChange = {imageUrl = it},
-                label = { Text("Image URL") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp))
+            CustomTextField(
+                value = imageUrl,
+                onValueChange = { imageUrl = it },
+                labelRes = R.string.edit_et_imageurl,
+                isPassword = false,
+                largeTexfield = true,
+                tallTextField = false
+            )
 
             Spacer(Modifier.height(24.dp))
 
             AsyncImage(model = ImageRequest.Builder(LocalContext.current)
                 .data(imageUrl)
-                // .crossfade(true)
+                .crossfade(true)
                 .build(),
                 placeholder = painterResource(R.drawable.feedarticles_logo),
-                contentDescription = "Illustration d'article",
+                contentDescription = stringResource(R.string.edit_desc_articleillustration),
                 contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .size(100.dp)
+                modifier = Modifier.padding(horizontal = 10.dp)
+                                .size(100.dp)
             )
 
             Spacer(Modifier.height(24.dp))
@@ -153,63 +160,41 @@ fun EditContent(
             Row(horizontalArrangement = Arrangement.Center)
             {
 
-                Row(horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp)
-                        .selectable(
-                            selected = selectedCategory.value == Category.SPORT,
-                            onClick = { selectedCategory.value = Category.SPORT },
-                            role = Role.RadioButton
-                        ))
-                {
-                    RadioButton(modifier = Modifier.padding(end = 2.dp),
-                        selected = selectedCategory.value == Category.SPORT, onClick = null)
-                    Text("Sport")
-                }
+                CustomRadioButtonRow(
+                    category = Category.SPORT,
+                    labelResId = R.string.rblabel_sport,
+                    selectedCategory = selectedCategory.value,
+                    onClick = { selectedCategory.value = Category.SPORT }
+                )
 
-                Row(horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp)
-                        .selectable(
-                            selected = selectedCategory.value == Category.MANGA,
-                            onClick = { selectedCategory.value = Category.MANGA },
-                            role = Role.RadioButton
-                        ))
-                {
-                    RadioButton(modifier = Modifier.padding(end = 2.dp),
-                        selected = selectedCategory.value == Category.MANGA, onClick = null)
-                    Text("Manga")
-                }
+                CustomRadioButtonRow(
+                    category = Category.MANGA,
+                    labelResId = R.string.rblabel_manga,
+                    selectedCategory = selectedCategory.value,
+                    onClick = { selectedCategory.value = Category.MANGA }
+                )
 
-                Row(horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp)
-                        .selectable(
-                            selected = selectedCategory.value == Category.DIVERS,
-                            onClick = { selectedCategory.value = Category.DIVERS },
-                            role = Role.RadioButton
-                        ))
-
-                {
-                    RadioButton(modifier = Modifier.padding(end = 2.dp),
-                        selected = selectedCategory.value == Category.DIVERS, onClick = null)
-                    Text("Divers")
-                }
+                CustomRadioButtonRow(
+                    category = Category.DIVERS,
+                    labelResId = R.string.rblabel_misc,
+                    selectedCategory = selectedCategory.value,
+                    onClick = { selectedCategory.value = Category.DIVERS }
+                )
             }
         }
 
-        Button(onClick = { onButtonClicked.invoke(title, description, imageUrl, selectedCategory.value) })
-        {
-            Text("Enregistrer")
-        }
+        CustomButton(onClick = { onButtonClicked.invoke(title, description, imageUrl, selectedCategory.value) },
+            labelRes = R.string.edit_button_create,
+            largeButton = true
+        )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun EditPreview() {
-    TutoComposeOct23Theme {
-        EditContent(ArticleDto(0, "TITRE", "DESK","",0,"",0)){_,_,_,_-> }
+    FeedArticlesComposeTheme {
+        EditContent(ArticleDto(0, "TITRE", "DESC","",0,"",0)){_,_,_,_-> }
     }
 }
 

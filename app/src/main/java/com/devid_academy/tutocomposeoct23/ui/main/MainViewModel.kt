@@ -1,5 +1,7 @@
 package com.devid_academy.tutocomposeoct23.ui.main
 
+import androidx.compose.material.DismissState
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devid_academy.tutocomposeoct23.MyPrefs
@@ -33,6 +35,9 @@ class MainViewModel
 
     private val _expandedArticleIdStateFlow = MutableStateFlow(0L)
     val expandedArticleIdStateFlow = _expandedArticleIdStateFlow.asStateFlow()
+
+    private val _articleWasDeletedStateFlow = MutableStateFlow(false)
+    val articleWasDeletedStateFlow = _articleWasDeletedStateFlow.asStateFlow()
 
 
     private val _navSharedFlow = MutableSharedFlow<String>()
@@ -114,34 +119,38 @@ class MainViewModel
 
 
 
-    fun deleteArticle(idArticle : Long, token : String){
+    fun deleteArticle(articleId : Long, articleUserId : Long){
 
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                repository.deleteArticle(idArticle, token)
-            }.let {
+        if(myPrefs.user_id == articleUserId){
+            viewModelScope.launch {
+                withContext(Dispatchers.IO){
+                    repository.deleteArticle(articleId, myPrefs.token!!)
+                }.let {
 
-                when (it) {
-                    is NetworkResult.Success -> {
+                    when (it) {
+                        is NetworkResult.Success -> {
 
-                        _userMessageSharedFlow.emit("Votre article a bien été supprimé.")
+                            _userMessageSharedFlow.emit("Votre article a bien été supprimé.")
+                            _articleWasDeletedStateFlow.emit(true)
+                            fetchArticles()
 
-                    }
-                    is NetworkResult.Error -> {
-
-                        when(it.errorCode){
-                            304 -> "L'article n'a pas pu être supprimé. Veuillez réessayer plus tard."
-                            400 -> "L'article n'a pas pu être supprimé. Problème de paramètres. Veuillez contacter l'administrateur."
-                            401 -> "L'article n'a pas pu être supprimé. Problème d'autorisation. Veuillez vous reconnecter."
-                            503 -> "Le compte n'a pas pu être créé. Erreur de requête mysql. Veuillez contacter l'administrateur.(Erreur 503)"
-                            else -> "Erreur. L'article n'a pas pu être supprimé. Veuillez réessayer plus tard. "
-                        }.let {errorMessage ->
-                            _userMessageSharedFlow.emit(errorMessage)
                         }
+                        is NetworkResult.Error -> {
 
-                    }
-                    is NetworkResult.Exception -> {
-                        _userMessageSharedFlow.emit("Erreur. L'article n'a pas pu être supprimé. Veuillez réessayer plus tard.")
+                            when(it.errorCode){
+                                304 -> "L'article n'a pas pu être supprimé. Veuillez réessayer plus tard."
+                                400 -> "L'article n'a pas pu être supprimé. Problème de paramètres. Veuillez contacter l'administrateur."
+                                401 -> "L'article n'a pas pu être supprimé. Problème d'autorisation. Veuillez vous reconnecter."
+                                503 -> "Le compte n'a pas pu être créé. Erreur de requête mysql. Veuillez contacter l'administrateur.(Erreur 503)"
+                                else -> "Erreur. L'article n'a pas pu être supprimé. Veuillez réessayer plus tard. "
+                            }.let {errorMessage ->
+                                _userMessageSharedFlow.emit(errorMessage)
+                            }
+
+                        }
+                        is NetworkResult.Exception -> {
+                            _userMessageSharedFlow.emit("Erreur. L'article n'a pas pu être supprimé. Veuillez réessayer plus tard.")
+                        }
                     }
                 }
             }
@@ -163,8 +172,6 @@ class MainViewModel
                 _expandedArticleIdStateFlow.value = clickedArticleId
 
             }
-
-
         }
     }
 

@@ -6,6 +6,8 @@ import android.widget.Toast
 import com.devid_academy.tutocomposeoct23.network.ApiInterface
 import retrofit2.HttpException
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 object Category {
     val SPORT = 1
@@ -38,3 +40,13 @@ sealed class NetworkResult<out T : Any> {
     data class Error(val errorCode: Int, val errorMessage: String?) : NetworkResult<Nothing>()
     data class Exception(val e: Throwable) : NetworkResult<Nothing>()
 }
+
+
+fun formatDate(creationDate : String) : String? {
+
+    return SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(creationDate)?.let {
+                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    .format(it)
+    }
+}
+

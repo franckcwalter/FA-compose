@@ -20,16 +20,13 @@ class LoginViewModel
 @Inject constructor(
     private val repository: Repository,
     private val myPrefs: MyPrefs
-)
-: ViewModel()
+) : ViewModel()
 {
-
     private val _navSharedFlow = MutableSharedFlow<String>()
     val navSharedFlow = _navSharedFlow.asSharedFlow()
 
     private val _userMessageSharedFlow = MutableSharedFlow<String>()
     val userMessageSharedFlow = _userMessageSharedFlow.asSharedFlow()
-
 
     fun logInUser(login: String, password: String) {
 

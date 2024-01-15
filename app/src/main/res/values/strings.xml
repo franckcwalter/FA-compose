@@ -1,3 +1,37 @@
 <resources>
     <string name="app_name">Feed Articles</string>
+    <string name="desc_logo">Feed articles logo</string>
+    <string name="login_maintitle">Connectez-vous</string>
+    <string name="login_et_login">Login</string>
+    <string name="login_et_password">Mot de passe</string>
+    <string name="login_button_linktoregister">Pas de compte ? Inscrivez-vous !</string>
+    <string name="login_button_login">Se connecter</string>
+    <string name="register_et_password">Mot de passe</string>
+    <string name="register_et_password_confirm">Confirmation Mot de passe</string>
+    <string name="register_et_login">Login</string>
+    <string name="register_button_register">S\'inscrire</string>
+    <string name="register_maintitle">S\'inscrire</string>
+    <string name="crea_et_title">Titre</string>
+    <string name="crea_et_content">Contenu</string>
+    <string name="crea_et_urlImage">Image URL</string>
+    <string name="crea_desc_articleillustration">Illustration d\'article</string>
+    <string name="crea_button_create">Enregistrer</string>
+    <string name="edit_et_title">Titre</string>
+    <string name="edit_et_desc">Contenu</string>
+    <string name="edit_et_imageurl">Image URL</string>
+    <string name="edit_desc_articleillustration">Illustration article</string>
+    <string name="edit_button_create">Mettre à jour</string>
+    <string name="rblabel_misc">Divers</string>
+    <string name="rblabel_manga">Manga</string>
+    <string name="rblabel_sport">Sport</string>
+    <string name="rblabel_all">Tout</string>
+    <string name="desc_buttonlabel_maintocrea">Bouton Ajouter un article</string>
+    <string name="desc_buttonlabel_logOut">Bouton Se déconnecter</string>
+    <string name="desc_buttonlabel_deleteArticle">Bouton Supprimer l\'article</string>
+    <string name="articledetail_date">Du %1\$s</string>
+    <string name="articledetail_cat">Cat. %1\$s</string>
+    <string name="desc_buttonlabel_reducearticlesize">Bouton Réduire la taille de l\'article</string>
+    <string name="detail_articleillustration">Illustration d\'article</string>
+    <string name="crea_pagetitle">Nouvel Article</string>
+    <string name="edit_pagetitle">Edition Article</string>
 </resources>
