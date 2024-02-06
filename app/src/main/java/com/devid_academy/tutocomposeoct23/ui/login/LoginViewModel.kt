@@ -3,9 +3,9 @@ package com.devid_academy.tutocomposeoct23.ui.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devid_academy.tutocomposeoct23.MyPrefs
-import com.devid_academy.tutocomposeoct23.NetworkResult
 import com.devid_academy.tutocomposeoct23.R
 import com.devid_academy.tutocomposeoct23.Screen
+import com.devid_academy.tutocomposeoct23.network.NetworkResult
 import com.devid_academy.tutocomposeoct23.network.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +54,7 @@ class LoginViewModel
                             }
 
                             _navSharedFlow.emit(Screen.Main.route)
-                            _userMessageSharedFlow.emit(R.string.welcome_message + R.string.rblabel_misc)
+                            _userMessageSharedFlow.emit(R.string.welcome_message)
 
                         }
                         is NetworkResult.Error -> {

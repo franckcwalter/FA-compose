@@ -3,10 +3,10 @@ package com.devid_academy.tutocomposeoct23.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devid_academy.tutocomposeoct23.MyPrefs
-import com.devid_academy.tutocomposeoct23.NetworkResult
 import com.devid_academy.tutocomposeoct23.R
 import com.devid_academy.tutocomposeoct23.Screen
 import com.devid_academy.tutocomposeoct23.network.ArticleDto
+import com.devid_academy.tutocomposeoct23.network.NetworkResult
 import com.devid_academy.tutocomposeoct23.network.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

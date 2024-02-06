@@ -9,16 +9,6 @@ import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-object Category {
-    val SPORT = 1
-    val MANGA = 2
-    val DIVERS = 3
-}
-
-//*TODO : changer pour Int */
-fun Context.toast(userMessage : Int) =
-    Toast.makeText(this, userMessage, Toast.LENGTH_LONG).show()
-
 
 class MyPrefs (private val sharedPreferences: SharedPreferences) {
 
@@ -35,11 +25,15 @@ class MyPrefs (private val sharedPreferences: SharedPreferences) {
 
 }
 
-sealed class NetworkResult<out T : Any> {
-    data class Success<out T : Any>(val httpCode: Int, val responseBodyData: T) : NetworkResult<T>()
-    data class Error(val errorCode: Int, val errorMessage: String?) : NetworkResult<Nothing>()
-    data class Exception(val e: Throwable) : NetworkResult<Nothing>()
+
+object Category {
+    val SPORT = 1
+    val MANGA = 2
+    val DIVERS = 3
 }
+
+fun Context.toast(userMessage : Int) =
+    Toast.makeText(this, userMessage, Toast.LENGTH_LONG).show()
 
 
 fun formatDate(creationDate : String) : String? {

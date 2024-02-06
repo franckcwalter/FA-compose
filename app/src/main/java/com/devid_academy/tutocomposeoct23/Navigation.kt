@@ -1,5 +1,9 @@
 package com.devid_academy.tutocomposeoct23
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
@@ -41,7 +45,8 @@ fun AppNavigation(){
         startDestination = Screen.Splash.route
     ){
 
-        composable(Screen.Splash.route){
+        composable(route = Screen.Splash.route)
+        {
             val splashViewModel : SplashViewModel = hiltViewModel()
             SplashScreen(
                 navController = navController,
@@ -49,7 +54,8 @@ fun AppNavigation(){
             )
         }
 
-        composable(Screen.Login.route){
+        composable(Screen.Login.route)
+        {
             val loginViewModel : LoginViewModel = hiltViewModel()
             LoginScreen(
                 navController = navController,
@@ -93,6 +99,5 @@ fun AppNavigation(){
                 articleId = idArticle
             )
         }
-
     }
 }

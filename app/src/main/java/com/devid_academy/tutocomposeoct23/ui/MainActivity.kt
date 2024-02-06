@@ -17,7 +17,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             FeedArticlesComposeTheme {
-
                 Surface(modifier = Modifier.fillMaxSize(),
                      color = MaterialTheme.colors.background)
                 { AppNavigation() }

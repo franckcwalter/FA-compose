@@ -3,7 +3,6 @@ package com.devid_academy.tutocomposeoct23.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.devid_academy.tutocomposeoct23.MyPrefs
-import com.devid_academy.tutocomposeoct23.NetworkResult
 import com.devid_academy.tutocomposeoct23.network.ApiHandler
 import com.devid_academy.tutocomposeoct23.network.ApiInterface
 import com.devid_academy.tutocomposeoct23.network.ApiRoutes

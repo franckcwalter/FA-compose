@@ -8,6 +8,9 @@ val MainBlue = Color(0xFF0099CC)
 val MainBlack = Color(0xFF000000)
 val MainWhite = Color(0xFFFFFFFF)
 
+val DeleteRed = Color(0xFFFF5D5D)
+
+
 val MangaBackground = Color(0xFFc6f2cc)
 val SportBackground = Color(0xFFb6effb)
 val MiscBackground = Color(0xFFe3c6f0)

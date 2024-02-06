@@ -1,6 +1,5 @@
 package com.devid_academy.tutocomposeoct23.network
 
-import com.devid_academy.tutocomposeoct23.NetworkResult
 import com.squareup.moshi.Json
 import retrofit2.HttpException
 import retrofit2.Response
@@ -69,9 +68,3 @@ interface ApiInterface {
         @Body newArticleDto: NewArticleDto
     ) : Response<Unit>
 }
-
-
-
-
-
-

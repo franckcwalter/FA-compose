@@ -1,14 +1,17 @@
 package com.devid_academy.tutocomposeoct23.network
 
-import com.devid_academy.tutocomposeoct23.NetworkResult
 import retrofit2.HttpException
 import retrofit2.Response
 
+sealed class NetworkResult<out T : Any> {
+    data class Success<out T : Any>(val httpCode: Int, val responseBodyData: T) : NetworkResult<T>()
+    data class Error(val errorCode: Int, val errorMessage: String?) : NetworkResult<Nothing>()
+    data class Exception(val e: Throwable) : NetworkResult<Nothing>()
+}
 
 interface ApiHandler {
-    suspend fun <T : Any> handleApi(
-        execute: suspend () -> Response<T>
-    ): NetworkResult<T> {
+    suspend fun <T : Any> handleApi(execute: (suspend () -> Response<T>)) : NetworkResult<T>
+    {
         return try {
             val response = execute()
 
@@ -30,7 +33,7 @@ class Repository(private val apiInterface: ApiInterface) : ApiHandler {
     suspend fun register(
         login: String,
         mdp: String
-    ): NetworkResult<ResponseRegisterOrLoginDto>
+    ) : NetworkResult<ResponseRegisterOrLoginDto>
     {
         return handleApi { apiInterface.register(RegisterDto(login, mdp)) }
     }
@@ -38,7 +41,7 @@ class Repository(private val apiInterface: ApiInterface) : ApiHandler {
     suspend fun login(
         login: String,
         mdp : String
-    ): NetworkResult<ResponseRegisterOrLoginDto>
+    ) : NetworkResult<ResponseRegisterOrLoginDto>
     {
         return handleApi { apiInterface.login(login,mdp) }
     }
@@ -64,7 +67,7 @@ class Repository(private val apiInterface: ApiInterface) : ApiHandler {
         desc: String,
         image: String,
         cat: Int
-    ): NetworkResult<Unit>
+    ) : NetworkResult<Unit>
     {
         return handleApi { apiInterface.createArticle(token,
                             NewArticleDto(idU, title, desc, image, cat)) }
@@ -77,7 +80,7 @@ class Repository(private val apiInterface: ApiInterface) : ApiHandler {
         desc : String,
         image : String,
         cat : Int
-    ): NetworkResult<Unit>
+    ) : NetworkResult<Unit>
     {
         return handleApi { apiInterface.updateArticle(articleId, token,
                             UpdateArticleDto(articleId,title,desc, image, cat)) }
@@ -90,4 +93,3 @@ class Repository(private val apiInterface: ApiInterface) : ApiHandler {
         return handleApi { apiInterface.deleteArticle(idArticle, token) }
     }
 }
-

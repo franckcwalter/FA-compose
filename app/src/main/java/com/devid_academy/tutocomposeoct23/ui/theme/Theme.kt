@@ -18,16 +18,12 @@ private val LightColorPalette = lightColors(
 fun FeedArticlesComposeTheme(
     content: @Composable () -> Unit
 ) {
-
     MaterialTheme(
         colors = LightColorPalette,
         typography = Typography,
         shapes = Shapes,
         content = content
     )
-
-
-
 }
 
 /*

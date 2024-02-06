@@ -1,17 +1,22 @@
 package com.devid_academy.tutocomposeoct23.ui.main
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -30,21 +35,30 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.material.rememberDismissState
+import androidx.compose.material.rememberSwipeableState
+import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -55,6 +69,7 @@ import com.devid_academy.tutocomposeoct23.formatDate
 import com.devid_academy.tutocomposeoct23.network.ArticleDto
 import com.devid_academy.tutocomposeoct23.toast
 import com.devid_academy.tutocomposeoct23.ui.CustomRadioButtonRow
+import com.devid_academy.tutocomposeoct23.ui.theme.DeleteRed
 import com.devid_academy.tutocomposeoct23.ui.theme.FeedArticlesComposeTheme
 import com.devid_academy.tutocomposeoct23.ui.theme.MangaBackground
 import com.devid_academy.tutocomposeoct23.ui.theme.MiscBackground
@@ -120,11 +135,11 @@ fun MainContent(
     selectedCategory : Int,
     expandedArticleId : Long,
     articleWasDeleted : Boolean,
-    onItemSwiped : (Long, Long) -> Unit,
-    onCreaButtonClicked : () -> Unit,
-    onLogoutButtonClicked : () -> Unit,
-    onArticleClicked: (Long, Long) -> Unit,
-    onCategoryChanged : (Int) -> Unit)
+    onItemSwiped : (Long, Long) -> Unit = {_,_->} ,
+    onCreaButtonClicked : () -> Unit= {},
+    onLogoutButtonClicked : () -> Unit = {},
+    onArticleClicked: (Long, Long) -> Unit = {_,_ ->},
+    onCategoryChanged : (Int) -> Unit = {})
 {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally,
@@ -132,7 +147,8 @@ fun MainContent(
     {
 
         Row(horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth())
+            modifier = Modifier.fillMaxWidth()
+        )
         {
             Icon(imageVector = Icons.Rounded.Add,
                 contentDescription = stringResource(R.string.desc_buttonlabel_maintocrea),
@@ -165,9 +181,10 @@ fun MainContent(
                     background = {
                         Box(
                             Modifier
-                                .fillMaxSize()
+                                .fillMaxWidth()
+                                .height(80.dp)
                                 .padding(50.dp, 15.dp, 15.dp, 15.dp)
-                                .background(color = Color.Red))
+                                .background(color = DeleteRed))
                         { Icon(
                             modifier = Modifier.align(Alignment.CenterEnd),
                             imageVector = Icons.Rounded.Delete,
@@ -186,7 +203,7 @@ fun MainContent(
             }
         }
 
-        Row(modifier = Modifier.padding(vertical = 16.dp, horizontal = 12.dp))
+        Row(modifier = Modifier.padding(vertical = 16.dp, horizontal = 6.dp))
         {
 
             CustomRadioButtonRow(
@@ -220,6 +237,7 @@ fun MainContent(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ItemArticle(
     article : ArticleDto,
@@ -227,6 +245,7 @@ fun ItemArticle(
     onArticleClicked : (Long, Long) -> Unit)
 {
     Card(modifier = Modifier
+        .animateContentSize()
         .padding(10.dp)
         .fillMaxWidth()
         .clickable { onArticleClicked.invoke(article.id, article.idU) }
@@ -265,8 +284,11 @@ fun ItemArticle(
                 )
 
                 Text(text = article.titre,
-                    fontWeight = if (expanded) FontWeight.Bold else FontWeight.Normal,
-                    modifier = Modifier.weight(1f))
+                    style = MaterialTheme.typography.body1
+                        .copy(fontWeight = if (expanded) FontWeight.Bold else FontWeight.Normal),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 4.dp))
 
                 if (expanded)
                     Icon(imageVector = Icons.Rounded.ExpandLess,
@@ -286,7 +308,8 @@ fun ItemArticle(
                         .fillMaxWidth())
                 {
 
-                    Text(stringResource(R.string.articledetail_date, formatDate(article.createdAt) ?: ""))
+                    Text(stringResource(R.string.articledetail_date, formatDate(article.createdAt) ?: ""),
+                        style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
 
                     Text(stringResource(R.string.articledetail_cat,
                                             when (article.categorie){
@@ -294,12 +317,15 @@ fun ItemArticle(
                                                 Category.MANGA -> stringResource(R.string.rblabel_manga)
                                                 Category.DIVERS -> stringResource(R.string.rblabel_misc)
                                                 else -> {}
-                                            })
+                                            }),
+                        style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
                     )
                 }
 
                 Text(text = article.descriptif,
-                    modifier = Modifier.padding(horizontal = 8.dp))
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    style = MaterialTheme.typography.body1)
+
             }
         }
     }
